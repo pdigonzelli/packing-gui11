@@ -1,0 +1,89 @@
+<script language="speedscript">
+/*-----------------------------------------------------------------------*
+  File........: freexref.html
+  Version.....: 1.03 - 2/6/2001
+  Description : Creates xref files from given filenames
+  Input Param : <none>
+  Output Param: <none>
+  Author......: S.E. Southwell - BravePoint, Inc. (770) 449-9696
+  Copyright...: FreeFramework 2000  - http://www.freeframework.org
+  Created.....: 5/4/2000
+  Notes.......:
+ *-----------------------------------------------------------------------*/
+{ ffw/lib/ffw_global.i }                    /*PATH SETTINGS AND OTHER GENERAL THINGS*/
+{ ffw/lib/ffpplib.i }
+{ ffw/lib/lognote.i }
+{ ffw/lib/filetools.i }
+
+/*If in PRODUCTION mode, then bail! */
+
+IF NOT devCheck() THEN DO:
+	logNote("Caution","{&file-name} was requested by " + remote_addr + " but could not be run with the agents in Production mode.").
+	ShowErrorScreen("Unable to run {&file-name}.  Request was logged and will be reviewed.").  
+	RETURN.
+END.
+DEFINE VAR v-directory 	AS CHAR NO-UNDO.
+DEFINE VAR v-fileaction AS CHAR NO-UNDO.
+DEFINE VAR v-filelist	AS CHAR NO-UNDO.
+DEFINE VAR v-errmsg     AS CHAR NO-UNDO.
+DEFINE VAR v-filecount  AS INT NO-UNDO.
+DEFINE VAR v-success    AS LOGICAL NO-UNDO. /*Whether it compiled or not*/
+DEFINE VAR v-comment	AS CHAR NO-UNDO.    /*Other info from compiler*/
+DEFINE VAR v-webpath	AS CHAR NO-UNDO.    /*web path used to call a given program*/
+
+ASSIGN
+ v-fileaction = GET-VALUE("fileaction")
+ v-filelist = GET-VALUE("filename")
+ v-directory = GET-VALUE("directory") + "{&SLASH}"
+.
+
+
+</script>
+<html>
+<head>
+	<title>FreeFramework Xref Generator</title>
+	<link rel="STYLESHEET" type="TEXT/CSS" href="`ffstyles`freestyle.css">
+</head>
+
+<body background="`ffimages`lyellow.gif" bgcolor="#ccffff" text="#990000" link="#660066" vlink="#990000" alink="#990000">
+<table border="0" width="100%" cellspacing="0">
+<tr>
+	<td align="LEFT">
+		<span class="sectionname">FreeFrameWork Xref Generator</span>
+	</td>
+	<td align= "RIGHT">
+	<a href="freefiletools.html?directory=`v-directory`" onClick="history.back(); return false;">[Back to File Tools]</a></td>
+</tr>
+</table>
+<hr>
+<!--wss if v-errmsg ne "" then do: -->
+<span class="error">`v-errmsg`</span></br>
+<!--wss end. -->
+<!--wss
+DO v-filecount = 1 TO NUM-ENTRIES(v-filelist): 
+	ASSIGN v-success = DoXref(v-directory,ENTRY(v-filecount,v-filelist),OUTPUT v-comment).
+-->
+<!--wss IF v-success THEN DO: -->
+<br>
+<img src="`ffimages`good.gif" height="25" width="25" align="absbottom">&nbsp;
+<span class="success">
+`v-directory``ENTRY(v-filecount,v-filelist)`.x file generated.&nbsp;
+</span>
+<a href="freeview.html?from=freexref&filename=`v-directory + entry(v-filecount,v-filelist) + ".x"`"><img src="`ffimages`u-view.gif" width="32" height="36" border="0"></a>
+<!--wss END. /*successful compile*/ -->
+<!--wss ELSE DO: /*compile failed*/ -->
+<br>
+<img src="`ffimages`bad.gif" height="25" width="25" align="absbottom">&nbsp;
+<span class="failure">`v-directory``ENTRY(v-filecount,v-filelist)` did not xref:</span>
+<div class="failurenote">`v-comment`</div>
+<!--wss END. /*compile failed*/ -->
+<!--wss /*This has no effect in verions 3.0 and 3.1a due to a known bug in WebSpeed*/
+PUT STREAM WEBSTREAM CONTROL NULL (0). /*flush the buffer*/
+END. 
+-->
+<HR>
+
+</body>
+</html>
+
+

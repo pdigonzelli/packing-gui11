@@ -1,0 +1,51 @@
+<script language="speedscript">
+/*-----------------------------------------------------------------------*
+  File........: workshop.html
+  Version.....: 1.04 - 12/21/2000
+  Description : Replacement for WebSpeed workshop's frameset.
+  Input Param : <none>
+  Output Param: <none>
+  Author......: S.E. Southwell - Bravepoint, Inc. (770) 449-9696
+  Copyright...: FreeFramework 2000  - http://www.freeframework.org
+  Created.....: 5/10/2000
+  Notes.......: Must be precompiled in order to run, since a workshop.r
+  				already exists in the WebSpeed path.
+ *-----------------------------------------------------------------------*/
+{ ffw/lib/ffw_global.i }                    /*PATH SETTINGS AND OTHER GENERAL THINGS*/
+{ ffw/lib/ffpplib.i }
+{ ffw/lib/lognote.i }
+
+
+IF NOT devCheck() THEN DO:
+	logNote("Caution","{&file-name} was requested by " + remote_addr + " but could not be run with the agents in Production mode.").
+	ShowErrorScreen("Unable to run {&file-name}.  Request was logged and will be reviewed.").  
+	RETURN.
+END.
+
+</script>
+<html>
+<head>
+	<title>FreeFrameWork-Shop Version `ffversion`- 
+    <% &IF "{&WEB_CONTEXT_EXCLUDE}" = "YES" &THEN 
+       &ELSE    %>
+    "`WEB-CONTEXT:CONFIG-NAME`" Broker
+    <% &ENDIF %>
+    </title>
+</head>
+<frameset cols="154,*" border="1">
+     <frame name="WS_index" src="`appurl`/webtools/freeindex.html"
+            marginheight="1" marginwidth="1">
+     <frame name="WS_main" src="`appurl`/webtools/freefiletools.html?directory=."
+            marginheight="3" marginwidth="5">
+</frameset>
+<noframes>
+<h1>WebSpeed Workshop - FreeFrameWork Version `ffversion`- 
+    <% &IF "{&WEB_CONTEXT_EXCLUDE}" = "YES" &THEN 
+       &ELSE    %>
+    "`WEB-CONTEXT:CONFIG-NAME`" Broker
+    <% &ENDIF %>
+</h1>
+You need a browser from this century to see this page.
+</noframes>
+</html>
+

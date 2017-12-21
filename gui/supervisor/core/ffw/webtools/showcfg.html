@@ -1,0 +1,217 @@
+<script language="speedscript">
+/*-----------------------------------------------------------------------*
+  File........: showcfg.html
+  Version.....: 1.04 - 12/21/2000
+  Description : Show configuration data which was read in from the .ini files. 
+  Input Param : none
+  Output Param: <none>
+  Author......: S.E. Southwell - USI
+  Copyright...: 
+  Created.....: 3/22/2000
+  
+  NOTE:  Do not deploy with this program in your propath.  This is for testing 
+  and development only.
+ *-----------------------------------------------------------------------*/
+ { ffw/lib/ffw_global.i }    /*PATH SETTINGS AND OTHER GENERAL THINGS*/
+ { ffw/lib/ffpplib.i }		/*PLUS PACK LIBRARY*/
+ { ffw/lib/tt_ini.i }        /*.ini FILE TEMP-TABLES*/
+ 
+DEFINE SHARED VAR v-runlogpath      AS CHAR NO-UNDO.
+DEFINE SHARED VAR v-resettable      AS LOGICAL NO-UNDO.
+DEFINE SHARED VAR v-htmlcompileonfly AS LOGICAL NO-UNDO.
+DEFINE SHARED VAR v-checkinterval 	AS INTEGER NO-UNDO. /*how often to recycle the wait-for*/
+DEFINE SHARED VAR v-batchprocname 	AS CHAR    NO-UNDO. /*procedure to run (if any) during recycle*/
+DEFINE SHARED VAR v-webrunpath		AS CHAR    NO-UNDO. /*list of directories from which we can run webobjects*/
+DEFINE VAR v-fl AS LOGICAL NO-UNDO.
+
+/*If in PRODUCTION mode, then bail! */
+IF NOT devCheck() THEN DO:
+	logNote("Caution","{&file-name} was requested by " + remote_addr + " but could not be run with the agents in Production mode.").
+	ShowErrorScreen("Unable to run {&file-name}.  Request was logged and will be reviewed.").  
+	RETURN.
+END.
+
+
+
+</script>
+<html>
+<head>
+	<title>FreeFrameWork Configuration</title>
+	<link rel="STYLESHEET" type="TEXT/CSS" href="`ffstyles`freestyle.css">
+</head>
+
+<BODY background="`ffimages`lyellow.gif">
+<span class="sechdr">Agent Config and Status</span>
+(PID: `ENTRY(3,WEB-CONTEXT:EXCLUSIVE-ID,":")`) - FFW v.`ffversion`<br>
+<span class="sechdr2">Settings:</span><br>
+<table cellspacing="2" cellpadding="2" border="0">
+	<tr class="headerrow">
+		<td class="columnheader">Variable</td>
+		<td class="columnheader">Value</td>
+	</tr>
+	<tr class="dataroweven">
+		<td class="datacell">ProPath</td>
+		<td class="datacell"><a href="`appurl`/webtools/propath.w">[Click for detail]</a></td>
+	</tr>
+	<tr class="datarowodd">
+		<td class="datacell">WebRunPath</td>
+		<td class="datacell">`replace(v-webRunpath,",","<br>")`</td>
+	</tr>
+	<tr class="dataroweven">
+		<td class="datacell">Resettable</td>
+		<td class="datacell">`STRING(v-resettable,"Yes/No")`</td>
+	</tr>
+	<tr class="datarowodd">
+		<td class="datacell">HTMLCompileOnFly</td>
+		<td class="datacell">`STRING(v-htmlcompileonfly,"Yes/No")`</td>
+	</tr>
+	<tr class="dataroweven">
+		<td class="datacell">CheckInterval</td>
+		<td class="datacell">`MAX(v-checkInterval,15)` seconds</td>
+	</tr>
+	<tr class="datarowodd">
+		<td class="datacell">BatchProcName</td>
+		<td class="datacell">`IF v-batchprocname ne "" then v-batchprocname else "None"`</td>
+	</tr>
+	<!--wss for each tt-agentsetting: 
+    ASSIGN v-fl = not v-fl.
+    -->
+	<tr class="datarow`trim(string(v-fl,"even/odd"))`">
+		<td class="datacell">`html-encode(tt-agentsetting.varname)`&nbsp;</td>
+		<td class="datacell">`html-encode(tt-agentsetting.varvalue)`&nbsp;</td>
+	</tr>
+	<!--wss end. /*each tt-agentsetting*/ -->
+</table>
+<span class="sechdr2">Databases:</span><br>
+<table cellspacing="2" cellpadding="2" border="0">
+	<tr class="headerrow">
+		<td class="columnheader">Database Name</td>
+		<td class="columnheader">Connect Proc.</td>
+		<td class="columnheader">Notify Proc.</td>
+		<td class="columnheader">Down Periods</td>
+		<td class="columnheader">Filename</td>
+		<td class="columnheader">Host</td>
+		<td class="columnheader">Service</td>
+		<td class="columnheader">Network</td>
+		<td class="columnheader">Other Params</td>
+	</tr>
+	<!--wss for each tt-db:  
+    ASSIGN v-fl = not v-fl.
+    -->
+	<tr class="datarow`trim(string(v-fl,"odd/even"))`">
+		<td class="datacell">`tt-db.databasename`&nbsp;</td>
+		<td class="datacell">`tt-db.connectproc`&nbsp;</td>
+		<td class="datacell">`tt-db.notifyproc`&nbsp;</td>
+		<td class="datacell">`tt-db.downperiods`&nbsp;</td>
+		<td class="datacell">`tt-db.filename`&nbsp;</td>
+		<td class="datacell">`tt-db.hostname`&nbsp;</td>
+		<td class="datacell">`tt-db.servicename`&nbsp;</td>
+		<td class="datacell">`tt-db.network`&nbsp;</td>
+		<td class="datacell">`tt-db.otherparams`&nbsp;</td>
+	</tr>
+	<!--wss end. -->
+</table>
+
+<span class="sechdr2">Database Sets:</span><br>
+<table cellspacing="2" cellpadding="2" border="0">
+	<tr class="headerrow">
+		<td class="columnheader">Database Set Name</td>
+		<td class="columnheader">Databases in Set</td>
+	</tr>
+	<!--wss for each tt-dbset:  
+    ASSIGN v-fl = not v-fl.
+    -->
+	<tr class="datarow`trim(string(v-fl,"odd/even"))`">
+		<td class="datacell">`tt-dbset.dbset`&nbsp;</td>
+		<td class="datacell">`tt-dbset.dblist`&nbsp;</td>
+	</tr>
+	<!--wss end. -->
+</table>
+
+<span class="sechdr2">Objects:</span><br>
+<table cellspacing="2" cellpadding="2" border="0">
+	<tr class="headerrow">
+		<td class="columnheader">WebObject Name</td>
+		<td class="columnheader">Database Set</td>
+	</tr>
+	<!--wss for each tt-objectdb:  
+    ASSIGN v-fl = not v-fl.
+    -->
+	<tr class="datarow`trim(string(v-fl,"odd/even"))`">
+		<td class="datacell">`tt-objectdb.objectname`&nbsp;</td>
+		<td class="datacell">`tt-objectdb.dbset`&nbsp;</td>
+	</tr>
+	<!--wss end. -->
+</table>
+
+<span class="sechdr2">Redirects:</span><br>
+<table cellspacing="2" cellpadding="2" border="0">
+	<tr class="headerrow">
+		<td class="columnheader">Resource From</td>
+		<td class="columnheader">Resource To</td>
+		<td class="columnheader">Log?</td>
+		<td class="columnheader">Permanent?</td>
+	</tr>
+	<!--wss for each tt-redirect:  
+    ASSIGN v-fl = not v-fl.
+    -->
+	<tr class="datarow`trim(string(v-fl,"odd/even"))`">
+		<td class="datacell">`tt-redirect.resourcefrom`&nbsp;</td>
+		<td class="datacell">`tt-redirect.resourceto`&nbsp;</td>
+		<td class="datacell">`tt-redirect.log-fl`&nbsp;</td>
+		<td class="datacell">`tt-redirect.perm-fl`&nbsp;</td>
+	</tr>
+	<!--wss end. -->
+</table><br>
+
+<span class="sechdr2">IP Limited Objects:</span><br>
+<table cellspacing="2" cellpadding="2" border="0">
+	<tr class="headerrow">
+		<td class="columnheader">Resource</td>
+		<td class="columnheader">IP list</td>
+		<td class="columnheader">Error Message</td>
+	</tr>
+	<!--wss for each tt-iplimit:  
+    ASSIGN v-fl = not v-fl.
+    -->
+	<tr class="datarow`trim(string(v-fl,"odd/even"))`">
+		<td class="datacell">`tt-iplimit.resourcefrom`&nbsp;</td>
+		<td class="datacell">`tt-iplimit.iplist`&nbsp;</td>
+		<td class="datacell">`tt-iplimit.errormessage`&nbsp;</td>
+	</tr>
+	<!--wss end. -->
+</table><br>
+
+<span class="sechdr2">IP Addresses Banned:</span><br>
+<table cellspacing="2" cellpadding="2" border="0">
+	<tr class="headerrow">
+		<td class="columnheader">IP Address</td>
+	</tr>
+	<!--wss for each tt-ipkill:  
+    ASSIGN v-fl = not v-fl.
+    -->
+	<tr class="datarow`trim(string(v-fl,"odd/even"))`">
+		<td class="datacell">`tt-ipkill.ipaddr`&nbsp;</td>
+	</tr>
+	<!--wss end. -->
+</table><br>
+<% &IF "{&MULTI_DEV_PROPATHS}" = "YES" &THEN %>
+
+<span class="sechdr2">Developer Propaths:</span><br>
+<table cellspacing="2" cellpadding="2" border="0">
+	<tr class="headerrow">
+		<td class="columnheader">Developer</td>
+		<td class="columnheader">Propath</td>
+	</tr>
+	<!--wss for each tt-developer:  
+    ASSIGN v-fl = not v-fl.
+    -->
+	<tr class="datarow`trim(string(v-fl,"odd/even"))`">
+		<td class="datacell">`tt-developer.devname`&nbsp;</td>
+		<td class="datacell">`tt-developer.mypropath`&nbsp;</td>
+	</tr>
+	<!--wss end. -->
+</table>
+<% &ENDIF %>
+</body>
+</html>

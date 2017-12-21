@@ -1,0 +1,75 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<meta name="GENERATOR" content="Microsoft FrontPage 4.0">
+<meta name="ProgId" content="FrontPage.Editor.Document">
+<title>Developer notes</title>
+</head>
+
+<body>
+
+<h1>Developer notes</h1>
+<p>Documentation viewer (doc.p):</p>
+<ol>
+  <li>I am using MS Frontpage to edit the documentation pages.</li>
+  <li>By using the doc.p program to display the docs there is no need for any
+    static pages for the Pluspack.</li>
+  <li>The doc.p viewer program will substitute for the location of the Webspeed
+    static files if other than &quot;Webspeed31A&quot;.</li>
+  <li>It also substitutes links in the Frontpage docs to make it remain dynamic
+    through the browser.</li>
+  <li>I wish to keep the documentation dynamic so I can later substitute other
+    stuff.</li>
+</ol>
+<p>RCS:</p>
+<ol>
+  <li>Unfortunately it's barely tested and I have little experience in using it
+    trough the Pluspack. </li>
+  <li>It might need a total redesign as for how I've designed the task-system.
+    It's based on the Roundtable method.</li>
+  <li>There's currently no Deployment Manager, making it unusable as Roundtable
+    replacement.</li>
+  <li>I wish to create a RCS database in the plus directory for xref's etc for
+    Roundtable functionality.</li>
+</ol>
+<p>Compatibility:</p>
+<ol>
+  <li>This version is not compatible with Webspeed 2.1, because of extensive use
+    of dynamic queries.</li>
+  <li>It should work on all platforms, but unfortunately the testing has been
+    limited to NT/W2K due to availability of hardware.</li>
+  <li>&nbsp; </li>
+</ol>
+<p>PLUS Database: (my wish for future expansion)</p>
+<ol>
+  <li>I'd like to have a database (automatically configured) for Pluspack data
+    in the PLUS directory.</li>
+  <li>It should automatically synchronize with ubroker.properties and
+    conmgr.properties using file-date-timestamp.</li>
+  <li>It should keep program data for include/xref data for Roundtable
+    functionality</li>
+  <li>It can be used to configure the FFW toolpack and other stuff in
+    ubroker.properties.</li>
+  <li>It can be used for deployment help for saving and automatically
+    configuring ubroker.properties and conmgr.properties.</li>
+  <li>&nbsp;</li>
+</ol>
+<p>Broker-less operation mode: (my wish for future expansion)</p>
+<ol>
+  <li>&quot;/scripts/pluspack.exe/&quot;</li>
+  <li>I wish to create a messenger that automatically starts one Progress
+    process and communicates with it using Sockets.</li>
+  <li>It would enable an Explorer like functionality using HTML and Webspeed
+    code.</li>
+  <li>This can be used for stopping starting the admin-service remotely, and
+    killing processes left behind.</li>
+  <li>This could eventually be an HTML alternative for the adminservice.</li>
+  <li>This could enable us to use the web for Data-dictionary functionality.</li>
+  <li>&nbsp;&nbsp; </li>
+</ol>
+
+</body>
+
+</html>

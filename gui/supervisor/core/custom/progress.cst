@@ -1,0 +1,34 @@
+/* progress.cst - PROGRESS custom objects file - Version 8 - 01/31/97 */
+
+*NEW-CONTAINER Skn - Abm Simple(WINDOW)
+NEW-TEMPLATE    custom/template/cabm.w
+
+*NEW-CONTAINER Skn - Abm Simple vinculado (WINDOW)
+NEW-TEMPLATE    custom/template/cabmq.w
+
+*NEW-CONTAINER Skn - Abm Simple (FRAME)
+NEW-TEMPLATE    custom/template/cfabm.w
+
+*NEW-CONTAINER Skn - Abm Simple with folder (WINDOW)
+NEW-TEMPLATE    custom/template/cabmf.w
+
+*NEW-CONTAINER Skn - Abm Simple with folder (FRAME)
+NEW-TEMPLATE    custom/template/cfabmf.w
+
+*NEW-CONTAINER Skn - Abm Cabecera-Detalle (WINDOW)
+NEW-TEMPLATE    custom/template/cabmcd.w
+
+*NEW-CONTAINER Skn - Abm Cabecera-Detalle (FRAME)
+NEW-TEMPLATE    custom/template/cfabmcd.w
+
+*NEW-CONTAINER Skn - Abm Cabecera-Detalle-Items (WINDOW)
+NEW-TEMPLATE    custom/template/cabmcdi.w
+
+*NEW-CONTAINER Skn - Abm Cabecera-Detalle-Items (FRAME)
+NEW-TEMPLATE    custom/template/cfabmcdi.w
+
+*NEW-CONTAINER Skn - Consulta
+NEW-TEMPLATE    custom/template/dwin.w
+
+*NEW-CONTAINER Skn - Consulta con RB (FRAME)
+NEW-TEMPLATE    custom/template/f-rb.w

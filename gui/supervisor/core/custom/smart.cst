@@ -1,0 +1,69 @@
+/* smart.cst - custom SmartObject file - Version 8 - 01/08/97 
+ ************************************************************************
+ Changes from 8.0A
+     Add Simple SmartObject to FILE/NEW.
+     Add "SmartObject." to palette 
+           (NOTE "." to distinguish from FILE/NEW SmartObject)
+     Add Object: rb-wrap.w, p-abc.w, p-navtxt.w
+ ************************************************************************/
+
+*NEW-SMARTOBJECT Skn - Viewer
+TYPE            smartviewer.
+NEW-TEMPLATE    custom/template/csmartv.w
+
+*NEW-SMARTOBJECT Skn - Browser
+TYPE            cSmartBrowser
+NEW-TEMPLATE    custom/template/csmartb.w
+
+*NEW-SMARTOBJECT Skn - Query Vinculado
+TYPE            skn-query.
+NEW-TEMPLATE    custom/template/cquery.w
+
+*SmartPanel	  Skn - Navigation Panel (&icons)
+USE		  custom/objects/cus-navico.w
+
+*SmartPanel	  Skn - Update Panel (&icons)
+USE		  custom/objects/cus-updsav.w
+
+*SmartPanel	  Skn - Miscelaneous Panel (&icons)
+USE		  custom/objects/cus-misc.w
+
+#Skn-SmartViewer    &Skn-Viewer
+UP-IMAGE-FILE   custom/imagen/grandes/copy
+DOWN-IMAGE-FILE custom/imagen/grandes/copy
+LABEL           Skn-Smart&Viewer
+DB-CONNECT
+NEW-TEMPLATE    custom/template/csmartv.w
+DIRECTORY-LIST  .,adm/samples
+FILTER          v-*.*,v-*.w,v-*.r,*.*
+TITLE           Choose Skn - SmartViewer
+
+#Skn-SmartBrowser    &Skn-Browser
+UP-IMAGE-FILE   adeicon/wp_up 28,196
+DOWN-IMAGE-FILE adeicon/wp_down 28,196
+LABEL           Skn-Smart&Browser
+DB-CONNECT
+NEW-TEMPLATE    custom/template/csmartb.w
+DIRECTORY-LIST  .,adm/samples
+FILTER          v-*.*,v-*.w,v-*.r,*.*
+TITLE           Choose Skn - SmartBrowser
+
+#Skn-ConsultaRB &Skn-Consulta con RB
+UP-IMAGE-FILE   custom/imagen/iconos/ii-ampl 28,196
+DOWN-IMAGE-FILE custom/imagen/iconos/ii-ampl 28,196
+LABEL           Skn-ConsultaRB
+DB-CONNECT
+NEW-TEMPLATE    custom/template/f-rb.w
+DIRECTORY-LIST  .,adm/samples
+FILTER          f*.*,f*.w,f*.r,*.*
+TITLE           Choose Skn - ConsultaRB
+
+#Skn-Query    &Skn-Query
+UP-IMAGE-FILE   custom/imagen/grandes/copy
+DOWN-IMAGE-FILE custom/imagen/grandes/copy
+LABEL           Skn-&Query
+DB-CONNECT
+NEW-TEMPLATE    custom/template/cquery.w
+DIRECTORY-LIST  .,adm/samples
+FILTER          v-*.*,v-*.w,v-*.r,*.*
+TITLE           Choose Skn - Query Vincualdo

@@ -1,0 +1,55 @@
+<script language="speedscript">
+/*-----------------------------------------------------------------------*
+  File........: schemalist.html
+  Version.....: 1.04 - 12/21/2000
+  Description : Shows list of databases from which the user can choose to view one.
+  Input Param : <none>
+  Output Param: <none>
+  Author......: S.E. Southwell - BravePoint / USI (770) 449-9696
+  Copyright...: FreeFramework 2000  - http://www.freeframework.org
+  Created.....: 1998
+  Notes.......:
+------------------------------------------------------------------------*/
+{ ffw/lib/ffw_global.i }                    /*PATH SETTINGS AND OTHER GENERAL THINGS*/
+{ ffw/lib/ffpplib.i }
+{ ffw/lib/lognote.i }
+
+DEFINE VAR i        AS INTEGER NO-UNDO.
+DEFINE VAR v-dbname AS CHAR NO-UNDO. 
+
+IF NOT devCheck() THEN DO:
+	logNote("Caution","{&file-name} was requested by " + remote_addr + " but could not be run with the agents in Production mode.").
+	ShowErrorScreen("Unable to run {&file-name}.  Request was logged and will be reviewed.").  
+	RETURN.
+END.
+  
+ASSIGN v-dbname = GET-VALUE("dbname").  
+RUN procs/chgdictdb.p(v-dbname) NO-ERROR.
+
+</script>
+  
+<HTML>
+<HEAD>
+	<TITLE>FreeFrameWork Schema Listing</TITLE>
+	<link rel="STYLESHEET" type="TEXT/CSS" href="`ffstyles`freestyle.css">
+</HEAD>
+<BODY>
+<% IF LDBNAME("dictdb") NE v-dbname THEN DO: %>
+<span class="error">Not able to display schema for `v-dbname`</span>   
+Current database is `LDBNAME("dictdb")` 
+<% END. ELSE DO: %>      
+<FORM NAME="webForm" METHOD="POST">
+Choose a Database:
+<SELECT NAME="dbName" CLASS="datafield">
+<% DO i = 1 TO NUM-DBS: %>
+<OPTION`(IF v-dbname = LDBNAME(i) THEN " SELECTED" ELSE "")`>`LDBNAME(i)`
+<% END. /*i*/ %>
+</SELECT>
+<INPUT TYPE="SUBMIT" NAME="runAction" VALUE="Display Schema">&nbsp; 
+</FORM>
+<% END. /*there were databases*/ %>
+<% IF REQUEST_METHOD = "POST" THEN RUN ffw/webtools/showschema.p GET-FIELD("dbName"). %>
+</BODY>
+</HTML>
+
+

@@ -1,0 +1,67 @@
+<script language="speedscript">
+/*-----------------------------------------------------------------------*
+  File........: ffwsetup.html
+  Version.....: 1.1
+  Description : Runs freecompile.html with the FFW workshop tools specified 
+                - does the initial compile.
+  Input Param : <none>
+  Output Param: <none>
+  Author......: S.E. Southwell - BravePoint (770) 449-9696
+  Copyright...: FreeFramework 2002 - http://www.freeframework.org
+  Created.....: 3/26/2002
+  Notes.......:
+ *-----------------------------------------------------------------------*/
+{ ffw/lib/ffw_global.i }                    /*PATH SETTINGS AND OTHER GENERAL THINGS*/
+{ ffw/lib/ffpplib.i }
+{ ffw/lib/lognote.i }
+
+/*If in PRODUCTION mode, then bail! */
+
+IF NOT devCheck() THEN DO:
+	logNote("Caution","{&file-name} was requested by " + remote_addr + " but could not be run with the agents in Production mode.").
+	ShowErrorScreen("Unable to run {&file-name}.  Request was logged and will be reviewed.").  
+	RETURN.
+END.
+
+DEFINE VAR v-filename 	AS CHAR NO-UNDO.
+DEFINE VAR v-errmsg     AS CHAR NO-UNDO.
+
+ASSIGN
+ v-filename = v-filename 
+ + "ffw/webtools/ffwsetup.html,"
+ + "ffw/webtools/freebackup.html,"
+ + "ffw/webtools/freecompile.html,"
+ + "ffw/webtools/freedelete.html,"
+ + "ffw/webtools/freedep.html,"
+ + "ffw/webtools/freefileact.html,"
+ + "ffw/webtools/freefiletools.html,"
+ + "ffw/webtools/freeindex.html,"
+ + "ffw/webtools/freetempw.html,"
+ + "ffw/webtools/freeview.html,"
+ + "ffw/webtools/schemalist.html,"
+ + "ffw/webtools/showcfg.html,"
+ + "ffw/webtools/showschema.p,"
+ + "ffw/webtools/viewlog.html,"
+ + "ffw/webtools/workshop.html,"
+ + "ffw/robust/wserrormsg.html,"
+ + "ffw/robust/dbconnect.p,"
+ + "ffw/robust/dbnotify.p,"
+ + "ffw/robust/ffdbcheck.p,"
+ + "ffw/robust/ffweb-disp.p,"
+ + "ffw/robust/ffweb-util.p"
+.
+SET-USER-FIELD("filename",v-filename).
+SET-USER-FIELD("directory",".").
+
+
+RUN run-web-object IN web-utilities-hdl("webtools/freecompile.html").
+RETURN.
+
+
+PROCEDURE output-headers:
+    OUTPUT-HTTP-HEADER("Cache-Control","no-cache").
+    OUTPUT-HTTP-HEADER("Pragma","no-cache").
+    OUTPUT-CONTENT-TYPE("text/html").
+END. /*output-header*/
+</script>
+

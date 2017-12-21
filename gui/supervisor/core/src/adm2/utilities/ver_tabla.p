@@ -1,0 +1,3 @@
+FOR EACH CustomTable WHERE ObjectName BEGINS "vasig" NO-LOCK:
+    UPDATE CustomTable.RelatedQuery VIEW-AS EDITOR INNER-LINES 10 INNER-CHARS 70.
+END.

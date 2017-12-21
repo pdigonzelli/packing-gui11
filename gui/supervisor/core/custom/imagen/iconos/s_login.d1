@@ -1,0 +1,7 @@
+if opsys = "UNIX" or opsys = "WIN32" then
+    path = vlc_dir_fuentes + "supervisor,".
+
+if opsys = "UNIX" or opsys = "WIN32" then
+    propath = path. 
+
+return.

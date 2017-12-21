@@ -1,0 +1,18 @@
+#CustomComboBox  &Default
+UP-IMAGE-FILE   adeicon/wp_up 24,264
+DOWN-IMAGE-FILE adeicon/wp_down 24,264
+LABEL           Custom&ComboBox
+NEW-TEMPLATE    adm2/template/cuscombobox.w
+DIRECTORY-LIST  .,adm2
+FILTER          cmb*.w,b*.r,b*.*,*.*
+TITLE           Choose CustomComboBox
+
+*NEW-SMARTOBJECT Custom&ComboBox
+TYPE            CustomComboBox
+NEW-TEMPLATE    adm2/template/cuscombobox.w
+
+#SmartLookup    &Default
+UP-IMAGE-FILE   adeicon/wp_up 24,264
+DOWN-IMAGE-FILE adeicon/wp_down 24,264
+LABEL           Smart&lookup
+USE             adm2/cuslookup.w

@@ -1,0 +1,27 @@
+# Propath.dat
+#
+# This file contains entries that will be loaded into the propath 
+# by a compile object. Lines beginning with a "#" are comment 
+# lines. Each line of this file will be considered another entry 
+# in the propath. Multiple propath entries may be entered on one 
+# line using a comma "," delimiter. "\" and "/" will be converted 
+# to either a slash or backslash depending on the OS to handle 
+# portability issues. Blank lines are allowed. The default working 
+# directory "." will automatically be added  to the beginning of 
+# the propath below. The initial value of the propath will be 
+# appended to the end of the propath listed below. 
+
+# Define any variables that will be substituted in the propath
+# specified below.  
+
+BaseDirectory = d:\webspeed\questware
+SomeOtherDirectory = c:\winnt
+
+# Define propath entries here. Variables defined above and specified 
+# in the propath below must begin with "$" to be recgonized as a 
+# variable at substitution time
+
+$BaseDirectory\wk
+$BaseDirectory\database
+d:\temp,d:\temp\posse 
+$SomeOtherDirectory\temp

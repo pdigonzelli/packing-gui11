@@ -1,0 +1,67 @@
+<script language="speedscript">
+/*-----------------------------------------------------------------------*
+  File........: wserrormsg.html
+  Version.....: 1.04 12/13/2000
+  Description : This program is a replacement for the infamous "White Screen
+                of Death" commonly seen in WebSpeed applications.  In cases 
+                where a program that is requested cannot be run because of 
+                permissions, database outage, compilation errors, or 
+                file-not-found errors, this customizable page is displayed in the
+                place of the "White Screen of Death"
+  Input Param : p_errortext
+  Output Param: <none>
+  Author......: S.E. Southwell -  United Systems, Inc. (770) 449-9696
+  Copyright...: FreeFramework 2000 - http://www.freeframework.org
+  Created.....: 3/22/2000
+  NOTES.......:  Do NOT use any database references in this program.  This error 
+                 code must be able to run when databases are not connected!  You
+                 could cause some SERIOUS mayhem by using database references here.
+			
+                 Make sure that you don't use include files that contain database 
+                 references.
+			
+                 Keep this program as simple as possible!!!  Did I mention not
+                 to use database references?
+				
+                 You will probably want to change the stylesheet reference to some
+                 thing other than /webspeed/freestyle.css
+                
+  Changes :  9/12/01 - GC - SF Bug 408244 - Remove hardcoded email address,
+                            used relative width for table, changed "Last
+                            Modified" to "Error Recorded"              
+ *-----------------------------------------------------------------------*/
+{ ffw/lib/ffw_global.i }
+{ ffw/lib/agentsetting.i }
+
+
+/*input parameters are abnormal for webObjects, but this is a legitimate exception.*/
+DEFINE INPUT PARAMETER p_errortext AS CHARACTER NO-UNDO.
+DEFINE VARIABLE WebMasterEmail AS CHARACTER NO-UNDO.
+
+/* Assign Your Email Address Here */
+
+ASSIGN WebMasterEmail = GetAgentSetting("AdminEmail").        
+                                          
+</script>
+<HTML>
+<HEAD>
+<TITLE>FreeFrameWork Error</TITLE>
+<TABLE width="80%">
+<TR valign="top" align="left"> 
+    <TD>
+	<!--Page content goes here -->
+	<span class="sechdr">Error!</span><br>
+
+	<span class="error">`p_errortext`</span>
+
+	<p>The problem has been logged, and will be reviewed.  If you need assistance, 
+	please <a href="mailto:`WebMasterEmail`">Email the webmaster.</a></p>
+
+  	<!--End of page content -->
+	</TD>
+</TR>
+</TABLE>
+
+<div class="lastmod">ERROR Recorded on: `today` at `string(time,"hh:mm:ss")`</div>
+</BODY>
+</HTML>

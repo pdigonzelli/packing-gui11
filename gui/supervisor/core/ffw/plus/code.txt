@@ -1,0 +1,95 @@
+
+Module:    Action:     Function:                      Code:
+
+
+*                                                     plus.i oPlus.p oHTML.p
+
+db                     Database list                  db.p oDatabase.p
+           vst         Virtual system tables
+           rep         Data dictionary
+
+                       Data browser
+           Count
+           First
+           Next
+           Prev
+           Last
+
+           Delete      Data details
+           Add
+           Save
+           Edit
+
+am                                                    am.p
+           AddTsk      Configure Tasks                          ----> oConfig.p
+           RemTsk
+           AddLib      Configure R-code library
+           RemLib
+
+           UpdLib      Update library                           ----> oProutil.p
+           ListLib     View library
+           StopBrk     Broker stop
+           StartBrk    Broker start
+           ViewBrk     Show status
+           ViewBrkAxxx Kill PID=xxx & Show status
+
+
+           comp        Compile                                  ----> oCode.p
+           Initcompile Compile Code
+           document    Code documenter
+
+
+
+    syscfg             System configuration           amcfgsys.p
+           AddWS                                                ----> oConfig.p
+           AddNS
+           AddAS
+           AddOD
+           AddOR
+           AddDB
+
+    appcfg             application configuration      amcfg.p
+           AddDir                                               ----> oConfig.p
+           RemDir
+
+    DUtil              code utilities                 amfile.p
+
+           Beautify    Beautifier                     oAnalyze.p
+
+           compile     Compiler                                  ----> oCode.p
+           precompile
+           listing
+           xref
+           sxr
+           debug
+
+           RCS         RCS                                       ----> oRCS.p
+           Del
+           End
+           Add
+           Diff
+
+
+
+    DB                 database utilities             amdb.p     ----> oProutil.p
+           serve
+           shut
+           sharedmem
+           truncate
+           iostats
+           holder
+           busy
+           dellog
+           idxbuild
+           ixanalys
+           tabanalys
+           idxcheck
+           backup
+           incremental
+           structstat
+           disconnect
+           connect
+           trimV9
+
+
+           

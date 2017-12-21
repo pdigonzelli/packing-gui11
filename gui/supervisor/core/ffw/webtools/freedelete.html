@@ -1,0 +1,113 @@
+<script language="speedscript">
+/*-----------------------------------------------------------------------*
+  File........: freedelete.html
+  Version.....: 1.04 - 9/14/2001
+  Description : Delete one or more files in the same directory
+  Input Param : none
+  Output Param: <none>
+  Author......: S.E. Southwell - BravePoint, Inc.
+  Copyright...: FreeFramework Project - http://www.freeframework.org
+  Created.....: 5/10/2000
+  Notes.......:
+ *-----------------------------------------------------------------------*/
+{ ffw/lib/ffw_global.i }                    /*PATH SETTINGS AND OTHER GENERAL THINGS*/
+{ ffw/lib/ffpplib.i }
+{ ffw/lib/filetools.i }
+{ ffw/lib/lognote.i }
+
+IF NOT devCheck() THEN DO:
+	logNote("Caution","{&file-name} was requested by " + remote_addr + " but could not be run with the agents in Production mode.").
+	ShowErrorScreen("Unable to run {&file-name}.  Request was logged and will be reviewed.").  
+	RETURN.
+END.
+
+/*From the webrunpath specified in the .ini file*/
+DEFINE SHARED VAR v-webrunpath		AS CHAR    NO-UNDO. /*list of directories from which we can run webobjects*/
+ 
+DEFINE VAR v-directory 	AS CHAR NO-UNDO.
+DEFINE VAR v-fileaction AS CHAR NO-UNDO.
+DEFINE VAR v-filelist	AS CHAR NO-UNDO.
+DEFINE VAR v-errmsg     AS CHAR NO-UNDO.
+DEFINE VAR v-filecount  AS INT NO-UNDO.
+DEFINE VAR v-success    AS LOGICAL NO-UNDO. /*Whether it compiled or not*/
+DEFINE VAR v-comment	AS CHAR NO-UNDO.    /*Other info from compiler*/
+DEFINE VAR v-webpath	AS CHAR NO-UNDO.    /*web path used to call a given program*/
+DEFINE VAR v-errcnt		AS INTEGER NO-UNDO.
+DEFINE VAR v-thisfiletype AS CHAR NO-UNDO.
+DEFINE VAR v-filter     AS CHAR NO-UNDO.
+
+ASSIGN
+ v-fileaction = GET-VALUE("fileaction")
+ v-filelist = GET-VALUE("filename")
+ v-directory = GET-VALUE("directory") + "{&SLASH}"
+ v-filter = GET-VALUE("filter")
+.
+
+FUNCTION DoDelete RETURNS LOGICAL(
+ INPUT mydir AS CHAR,
+ INPUT myfile AS CHAR,
+ OUTPUT mycomment AS CHAR
+):
+	DEFINE VAR v-filetype 		AS CHAR NO-UNDO.
+	DEFINE VAR v-thisfilespec 	AS CHAR NO-UNDO.
+	DEFINE VAR v-noextfilename  AS CHAR NO-UNDO. /*filename without extension*/
+	
+	ASSIGN FILE-INFO:FILE-NAME = mydir + myfile.
+	IF FILE-INFO:FULL-PATHNAME = ? OR INDEX(FILE-INFO:FILE-TYPE,"d") > 0
+	 THEN DO:
+	 	ASSIGN mycomment = "File not found!".
+	 	RETURN FALSE. 
+	END. /*file didn't exist or was a directory*/
+	
+	ELSE DO: /*file is a regular file*/
+		ASSIGN
+		 v-thisfilespec = FILE-INFO:FULL-PATHNAME
+		.
+		OS-DELETE VALUE(v-thisfilespec).
+        IF OS-ERROR = 0 THEN RETURN TRUE.
+	    ELSE RETURN FALSE.
+	END.
+END FUNCTION.
+</script>
+<html>
+<head>
+	<title>FreeFrameWork Deleter</title>
+	<link rel="STYLESHEET" type="TEXT/CSS" href="`ffstyles`freestyle.css">
+</head>
+
+<body background="`ffimages`lyellow.gif">
+<table border="0" width="100%" cellspacing="0">
+<tr>
+	<td align="LEFT">
+		<span class="sectionname">FreeFrameWork Delete File</span>
+	</td>
+	<td align= "RIGHT">
+	<a href="freefiletools.html?directory=`url-encode(right-trim(v-directory,"{&SLASH}"),"query")`&filter=`v-filter`">[Back to File Tools]</a>
+	</td>
+</tr>
+</table>
+<% IF v-filelist ne "" THEN DO v-filecount = 1 TO NUM-ENTRIES(v-filelist): 
+	ASSIGN v-success = DoDelete(v-directory,ENTRY(v-filecount,v-filelist),OUTPUT v-comment).
+%>
+<% IF v-success THEN DO: %>
+<br>
+<img src="`ffimages`good.gif" height="25" width="25" align="absbottom">&nbsp;
+<span class="success">`v-directory``ENTRY(v-filecount,v-filelist)`&nbsp; was deleted.</span>
+<% END. /*successful delete*/ %>
+<% ELSE DO: /*delete failed*/ %>
+<br>
+<img src="`ffimages`bad.gif" height="25" width="25" align="absbottom">&nbsp;
+<span class="failure">`v-directory``ENTRY(v-filecount,v-filelist)` did not get deleted</span>
+<div class="failurenote">OS Error #`os-error`</div>
+<% END. /*compile failed*/ %>
+    <% /*This has no effect in verions 3.0 and 3.1a due to a known bug in WebSpeed*/
+    PUT STREAM WEBSTREAM CONTROL NULL (0). /*flush the buffer*/
+END. /*v-filecount*/ %>
+<% ELSE DO: %>
+<span class="failure">Nothing to delete</span>
+<% END. /* nothing to delete */ %>
+<HR>
+<a href="freefiletools.html?directory=`url-encode(right-trim(v-directory,"{&SLASH}"),"query")`&filter=`v-filter`">[Back to File Tools]</a>
+</body>
+</html>
+

@@ -1,0 +1,218 @@
+<script language="speedscript">
+/*-----------------------------------------------------------------------*
+  File........: freecompile.html
+  Version.....: 1.03 - 2/5/2000
+  Description : Compile one or more files in the same directory
+  Input Param : none
+  Output Param: <none>
+  Author......: S.E. Southwell - USI
+  Copyright...: FreeFramework Project - http://www.freeframework.org
+  Created.....: 5/10/2000
+  Notes.......:
+ *-----------------------------------------------------------------------*/
+{ ffw/lib/ffw_global.i }                    /*PATH SETTINGS AND OTHER GENERAL THINGS*/
+{ ffw/lib/ffpplib.i }
+{ ffw/lib/filetools.i }
+{ ffw/lib/lognote.i }
+
+IF NOT devCheck() THEN DO:
+	logNote("Caution","{&file-name} was requested by " + remote_addr + " but could not be run with the agents in Production mode.").
+	ShowErrorScreen("Unable to run {&file-name}.  Request was logged and will be reviewed.").  
+	RETURN.
+END.
+
+/*From the webrunpath specified in the .ini file*/
+DEFINE SHARED VAR v-webrunpath		AS CHAR    NO-UNDO. /*list of directories from which we can run webobjects*/
+ 
+DEFINE VAR v-directory 	AS CHAR NO-UNDO.
+DEFINE VAR v-fileaction AS CHAR NO-UNDO.
+DEFINE VAR v-filelist	AS CHAR NO-UNDO.
+DEFINE VAR v-errmsg     AS CHAR NO-UNDO.
+DEFINE VAR v-filecount  AS INT NO-UNDO.
+DEFINE VAR v-success    AS LOGICAL NO-UNDO. /*Whether it compiled or not*/
+DEFINE VAR v-comment	AS CHAR NO-UNDO.    /*Other info from compiler*/
+DEFINE VAR v-webpath	AS CHAR NO-UNDO.    /*web path used to call a given program*/
+DEFINE VAR v-errcnt		AS INTEGER NO-UNDO.
+DEFINE VAR v-thisfiletype AS CHAR NO-UNDO.
+DEFINE VAR v-speedscripttypes AS CHAR NO-UNDO.
+
+ASSIGN
+ v-fileaction = GET-VALUE("fileaction")
+ v-filelist = GET-VALUE("filename")
+ v-directory = GET-VALUE("directory") + "{&SLASH}"
+ v-speedscripttypes = GetAgentSetting("SpeedScriptTypes")
+.
+
+IF v-speedscripttypes = "" THEN ASSIGN v-speedscripttypes = ".html,.htm".
+
+/* ----------------------------------------------------------------*/
+/* Function: GetWebPath                                            */
+/* Purpose:  Find the shortest valid path under which this program */
+/*             could be run on the web.  Returns null, if cannot   */
+/* 			   be run.                                             */
+/* ----------------------------------------------------------------*/
+FUNCTION GetWebPath RETURNS CHAR(
+ INPUT myfullpath AS CHAR
+):
+	DEFINE VAR v-cnt AS INTEGER NO-UNDO. /*COUNTER*/
+	DEFINE VAR v-currentpath AS CHAR NO-UNDO. /*CURRENT SLICE OF PATH BEING TESTED*/
+	/*First check propath and make sure it belongs.*/
+	RUN webutil/_relname.p (INPUT myfullpath, "MUST-BE-REL", OUTPUT v-currentpath).
+    IF v-currentpath = ? THEN RETURN "".
+	
+    /*Get the FULLY QUALIFIED Path*/
+    ASSIGN FILE-INFO:FILE-NAME = v-currentpath.
+    ASSIGN
+     v-currentpath = REPLACE(FILE-INFO:FULL-PATHNAME,"~\","/")
+     myfullpath = FILE-INFO:FULL-PATHNAME
+    .
+    
+	/*Make sure it's in the webRunPath*/
+	IF NOT CAN-DO(v-WebRunPath,v-currentpath) THEN RETURN "".
+	ASSIGN v-currentpath = "". /*reinitialize, so it can be used below*/
+
+	/*go through the path piece by piece until we find the shortest URL that would run it*/
+	DO v-cnt = NUM-ENTRIES(myfullpath,"/") TO 1 BY -1:
+		ASSIGN v-currentpath = RIGHT-TRIM(ENTRY(v-cnt,myfullpath,"/") + "/" + v-currentpath,"/").
+		FILE-INFO:FILE-NAME = v-currentpath.
+		IF FILE-INFO:FULL-PATHNAME = myfullpath THEN RETURN v-currentpath.
+	END.
+	
+	/*If we've gone this far, then there's something wrong - return null*/
+	RETURN "".
+END FUNCTION.
+
+FUNCTION DoCompile RETURNS LOGICAL(
+ INPUT mydir AS CHAR,
+ INPUT myfile AS CHAR,
+ OUTPUT mycomment AS CHAR
+):
+	DEFINE VAR v-filetype 		AS CHAR NO-UNDO.
+	DEFINE VAR v-thisfilespec 	AS CHAR NO-UNDO.
+	DEFINE VAR v-noextfilename  AS CHAR NO-UNDO. /*filename without extension*/
+	
+	ASSIGN FILE-INFO:FILE-NAME = mydir + myfile.
+	IF FILE-INFO:FULL-PATHNAME = ? OR INDEX(FILE-INFO:FILE-TYPE,"d") > 0
+	 THEN DO:
+	 	ASSIGN mycomment = "File not found!".
+	 	RETURN FALSE. 
+	END. /*file didn't exist or was a directory*/
+	
+	ELSE DO: /*file is a regular file*/
+		/* ||| test that file has extension*/
+		ASSIGN
+		 v-filetype = SUBSTRING(myfile,R-INDEX(myfile,"."))
+		 v-thisfiletype = v-filetype
+		 v-noextfilename = SUBSTRING(myfile,1,R-INDEX(myfile,".") - 1)
+		 v-thisfilespec = FILE-INFO:FULL-PATHNAME
+		.
+
+		/*treat it differently, depending on what type of file it is*/
+	    IF CAN-DO(v-speedscripttypes,v-filetype) THEN DO:
+            /*check to make sure there's no pre-existing offset file*/
+            ASSIGN FILE-INFO:FILE-NAME = mydir + v-noextfilename + ".off".
+            IF FILE-INFO:FULL-PATHNAME NE ? THEN DO: /*.off exists*/
+            	ASSIGN mycomment = 'Cannot compile SpeedScript file ' + v-thisfilespec + ' because an offset (.off) file exists with this name.'.
+            	RETURN FALSE.
+            END. /*.off exists*/
+            /*check to make sure there's no pre-existing .w file*/
+            ASSIGN FILE-INFO:FILE-NAME = mydir + v-noextfilename + ".w".
+            IF FILE-INFO:FULL-PATHNAME NE ? THEN DO: /*.w exists*/
+            	ASSIGN mycomment = 'Cannot compile SpeedScript file ' + v-thisfilespec + ' because a webobject (.w) file exists with this name.'.
+            	RETURN FALSE.
+            END. /*.off exists*/
+            ASSIGN mycomment = htmlCompile(v-thisfilespec,mydir + v-noextfilename).
+            IF NOT mycomment BEGINS "OK" THEN RETURN FALSE.
+            ELSE RETURN TRUE.
+        END. /*html*/
+		ELSE CASE v-filetype:
+			WHEN ".w" OR WHEN ".p" THEN DO:
+                &IF "(&XCODE_COMPILES}" = "YES" &THEN
+                COMPILE VALUE(v-thisfilespec) XCODE getAgentSetting("xcode") SAVE NO-ERROR.
+                &ELSE
+				COMPILE VALUE(v-thisfilespec) SAVE NO-ERROR.
+				&ENDIF
+                IF ERROR-STATUS:ERROR OR COMPILER:ERROR
+				 THEN DO:
+				 	DO v-errcnt = 1 TO ERROR-STATUS:NUM-MESSAGES:
+						mycomment = (IF mycomment > "" THEN mycomment + "<br>" ELSE "") +
+						html-encode(error-status:get-message(v-errcnt)).
+					END. /*v-errcnt*/
+					RETURN FALSE.
+				END. /*ERRORS WITH COMPILE*/
+				ELSE RETURN TRUE.
+			END. /*.w or .p*/
+			OTHERWISE DO: /*can't handle this filetype*/
+				ASSIGN mycomment = 'Cannot compile files of type "' + v-filetype + '".'.
+				RETURN FALSE.
+			END. /*can't handle this filetype*/
+		END CASE. /*v-filetype*/
+		ASSIGN mycomment = v-filetype.
+		RETURN TRUE.
+	END.
+END FUNCTION.
+
+DEFINE VAR v-failedlist AS CHAR NO-UNDO.
+</script>
+<html>
+<head>
+	<title>FreeFrameWork Compiler</title>
+	<link rel="STYLESHEET" type="TEXT/CSS" href="`ffstyles`freestyle.css">
+</head>
+
+<body background="`ffimages`lyellow.gif">
+<% DO v-filecount = 1 TO NUM-ENTRIES(v-filelist): 
+	ASSIGN v-success = DoCompile(v-directory,ENTRY(v-filecount,v-filelist),OUTPUT v-comment).
+%>
+<% IF v-success THEN DO: %>
+<br>
+<img src="`ffimages`good.gif" height="25" width="25" align="absbottom">&nbsp;
+<span class="success">
+`v-directory``ENTRY(v-filecount,v-filelist)`&nbsp;
+<% if v-comment = "OK:include" then do: %>
+was successfully converted to a .i (include file).
+<% end. /*speedscript include*/ else do: %>
+compiled successfully.
+<% end. /*was compiled to a .r*/ %>
+</span>
+	<% if v-comment ne "OK:include" then do:
+	 assign v-webpath = getWebPath(v-directory + ENTRY(v-filecount,v-filelist)).
+	 if v-webpath ne "" then do: %>
+	<a href="`appurl`/`v-webpath`" title="Run this program."><img src="`ffimages`run.gif" height="29" width="20" align="absbottom" border="0" alt="Run this program."></a>
+	<% end. /*could be run from the web*/ %>
+	<% else do: /*can't be run from the web*/ %>
+	<img src="`ffimages`norun.gif" height="29" width="20" align="absbottom" border="0" alt="Cannot run this program from the web.  Check ProPath and WebRunPath">
+	<% end. /*can't be run from the web*/ %>
+	<% end. /*not an include file*/ %>
+    <% END. /*successful compile*/ %>
+    <% ELSE DO: /*compile failed*/ 
+        ASSIGN v-failedlist = v-failedlist + "," + ENTRY(v-filecount,v-filelist).
+    %>
+<br>
+<img src="`ffimages`bad.gif" height="25" width="25" align="absbottom">&nbsp;
+<span class="failure">`v-directory``ENTRY(v-filecount,v-filelist)` did not compile:</span>
+<div class="failurenote">`v-comment`</div>
+    <% END. /*compile failed*/ %>
+
+    <% IF v-thisfiletype = "htm" or v-thisfiletype = "html" THEN DO: %>
+<a href="freetempw.html?directory=`url-encode(right-trim(v-directory,"{&SLASH}"),"query")`&filename=`v-filelist`" title="Save temporary .w file for troubleshooting purposes."><img src="`ffimages`savew.gif" height="31" width="31" align="absbottom" border="0" alt="Save temporary .w file for troubleshooting purposes."></a>
+    <% END. /*It was HTML*/ %>
+
+<% /*This has no effect in verions 3.0 and 3.1a due to a known bug in WebSpeed*/
+PUT STREAM WEBSTREAM CONTROL NULL (0). /*flush the buffer*/
+END. 
+%>
+<HR>
+<a href="freefiletools.html?directory=`url-encode(right-trim(v-directory,"{&SLASH}"),"query")`&filename=`url-encode(v-filelist,"query")`" onclick="history.back(); return false;">[Back to File Tools]</a>
+&nbsp;&nbsp;
+<a href="freecompile.html?directory=`url-encode(right-trim(v-directory,"{&SLASH}"),"query")`&filename=`url-encode(v-filelist,"query")`&fileaction=`url-encode(v-fileaction,"query")`" onclick="location.replace('freecompile.html?directory=`url-encode(right-trim(v-directory,"{&SLASH}"),"query")`&filename=`url-encode(v-filelist,"query")`&fileaction=`url-encode(v-fileaction,"query")`&x=`trueRandom()`'); return false;">[Refresh]</a>
+<% if v-failedlist ne "" then do:
+       assign v-failedlist = trim(v-failedlist,", "). %>
+&nbsp;&nbsp;
+<a href="freecompile.html?directory=`url-encode(right-trim(v-directory,"{&SLASH}"),"query")`&filename=`url-encode(v-failedlist,"query")`&fileaction=`url-encode(v-fileaction,"query")`" onclick="location.replace('freecompile.html?directory=`url-encode(right-trim(v-directory,"{&SLASH}"),"query")`&filename=`url-encode(v-failedlist,"query")`&fileaction=`url-encode(v-fileaction,"query")`&x=`trueRandom()`'); return false;">[Recompile Failures]</a>
+<% end. /*something failed*/ %>
+
+
+</body>
+</html>
+

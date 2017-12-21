@@ -1,0 +1,182 @@
+if opsys = "UNIX" or opsys = "WIN32" then
+  do:
+     assign propath = vlc_dir_fuentes + lc(vlc_grupo) + "," +
+                      vlc_dir_fuentes + "supervisor,".
+
+     /*---CODIGO---*/
+     if lc(vlc_grupo) = "codigo" then
+      do:
+         find par_bases where
+              par_bases.id_base = "codigo" no-lock.
+
+         if vlc_host = par_bases.id_host then
+           connect value("-pf " + vlc_dir_fuentes + 
+                         "codigo/pd_codigo.pf") no-error.
+         else
+           connect value("-pf " + vlc_dir_fuentes + 
+                         "codigo/pr_codigo.pf") no-error.
+         if not connected("codigo") then
+          do:
+            message "No se puede conectar Base de Datos"
+                    view-as alert-box information.
+            quit.
+          end.
+      end.
+
+     /*---INVENTARIOS---*/
+     if lc(vlc_grupo) = "inventarios" then
+      do:
+         find par_bases where
+              par_bases.id_base = "inventarios" no-lock.
+
+         if vlc_host = par_bases.id_host then
+           connect
+           value("-pf " + vlc_dir_fuentes + 
+                 "inventarios/pd_inventar.pf") no-error.
+         else
+           connect
+           value("-pf " + vlc_dir_fuentes + 
+                 "inventarios/pr_inventar.pf") no-error.
+         if not connected("inventarios") then
+          do:
+            message "No se puede conectar Base de Datos"
+                    view-as alert-box information.
+            quit.
+          end.
+      end.
+
+     /*---GERENCIAL---*/
+     if lc(vlc_grupo) = "gerencial" or lc(vlc_grupo) = "tableros" then
+      do:
+         find par_bases where
+              par_bases.id_base = "gerencial" no-lock.
+
+         if vlc_host = par_bases.id_host then
+           connect
+           value("-pf " + vlc_dir_fuentes + 
+                 "gerencial/pd_geren.pf") no-error.
+         else
+           connect
+           value("-pf " + vlc_dir_fuentes + 
+                 "gerencial/pr_geren.pf") no-error.
+         if not connected("gerencial") then
+          do:
+            message "No se puede conectar Base de Datos"
+                    view-as alert-box information.
+            quit.
+          end.
+      end.
+
+     /*---MARKETING---*/
+     if lc(vlc_grupo) = "marketing" then
+      do:
+         find par_bases where
+              par_bases.id_base = "marketing" no-lock.
+
+         if vlc_host = par_bases.id_host then
+           connect
+           value("-pf " + vlc_dir_fuentes + 
+                 "marketing/pd_market.pf") no-error.
+         else
+           connect
+           value("-pf " + vlc_dir_fuentes + 
+                 "marketing/pr_market.pf") no-error.
+         if not connected("marketing") then
+          do:
+            message "No se puede conectar Base de Datos"
+                    view-as alert-box information.
+            quit.
+          end.
+      end.
+
+     /*---COMPUTOS---*/
+     if lc(vlc_grupo) = "computos" then
+      do:
+         find par_bases where
+              par_bases.id_base = "computos" no-lock.
+
+         if vlc_host = par_bases.id_host then
+           connect
+           value("-pf " + vlc_dir_fuentes + 
+                 "computos/pd_computos.pf") no-error.
+         else
+           connect
+           value("-pf " + vlc_dir_fuentes + 
+                 "computos/pr_computos.pf") no-error.
+         if not connected("computos") then
+          do:
+            message "No se puede conectar Base de Datos"
+                    view-as alert-box information.
+            quit.
+          end.
+      end.
+
+     /*---CREDITOS---*/
+     if lc(vlc_grupo) = "creditos" then
+      do:
+         find par_bases where
+              par_bases.id_base = "creditos" no-lock.
+
+         if vlc_host = par_bases.id_host then
+           connect
+           value("-pf " + vlc_dir_fuentes + 
+                 "creditos/pd_creditos.pf") no-error.
+         else
+           connect
+           value("-pf " + vlc_dir_fuentes + 
+                 "creditos/pr_creditos.pf") no-error.
+         if not connected("creditos") then
+          do:
+            message "No se puede conectar Base de Datos"
+                    view-as alert-box information.
+            quit.
+          end.
+      end.
+
+     /*---RETORNOS---*/
+     if lc(vlc_grupo) = "retornos" then
+      do:
+         find par_bases where
+              par_bases.id_base = "retornos" no-lock.
+
+         if vlc_host = par_bases.id_host then
+           connect
+           value("-pf " + vlc_dir_fuentes + 
+                 "retornos/pd_retornos.pf") no-error.
+         else
+           connect
+           value("-pf " + vlc_dir_fuentes + 
+                 "retornos/pr_retornos.pf") no-error.
+         if not connected("retornos") then
+          do:
+            message "No se puede conectar Base de Datos"
+                    view-as alert-box information.
+            quit.
+          end.
+      end.
+
+  end. /*-- END opsys = UNIX or opsys = WIN32 --*/
+
+if vlc_grupo = "stock" then
+ do:
+    input clear.
+    run ../s_stock.p (output salida).
+    if salida = no then
+       quit.
+ end.
+
+if vlc_grupo = "compras" then
+ do:
+    input clear.
+    run ../s_compra.p (output salida).
+    if salida = no then
+       quit.
+ end.
+
+if vlc_grupo = "sra" then
+ do:
+    input clear.
+    run ../s_sra.p (output salida).
+    if salida = no then
+       quit.
+ end.

@@ -1,0 +1,28 @@
+TO DO:  (Webspeed Plus)
+
+1. cleanup
+  - Organize
+  - naming standards
+  - Beautify
+
+2. RCS package utility
+
+3. Update http://digre.com/webspeed/
+  - Push new code
+  - Configure and document revision control.
+
+4. System enhancer
+  - freeframework integration
+  - ubroker properties editor/enhancer
+  - registry editor
+
+5. Analyzer
+  - Indenting
+  - Code enhancer (grouping assign and {&out} statements)
+
+6. DHTML front-end
+  - configuration of virtual directory
+  - integration of current workshop functionality
+  - Browsers for database...
+  - Explorer functionality
+  - Perl based / _progres based Progress Explorer

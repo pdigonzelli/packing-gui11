@@ -1,0 +1,54 @@
+#CustomSmartDataObject &Default
+UP-IMAGE-FILE    adeicon/wp_up 24,288
+DOWN-IMAGE-FILE  adeicon/wp_down 24,288
+LABEL            CustomSmart&DataObject
+DB-CONNECT
+NEW-TEMPLATE     adm2/template/cusdata.w
+DIRECTORY-LIST   .,adm2
+FILTER           d*.w,d*.r,d*.*,*.*
+TITLE            Choose CustomSmartDataObject
+
+*NEW-SMARTOBJECT CustomSmart&DataObject
+TYPE		 CustomSmartDataObject
+NEW-TEMPLATE     adm2/template/cusdata.w
+
+#CustomSmartDataBrowser   &Default
+UP-IMAGE-FILE   adeicon/wp_up 24,264
+DOWN-IMAGE-FILE adeicon/wp_down 24,264
+LABEL           CustomSmartData&Browser
+NEW-TEMPLATE    adm2/template/cusbrowser.w
+DIRECTORY-LIST  .,adm2
+FILTER          b*.w,b*.r,b*.*,*.*
+TITLE           Choose CustomSmartDataBrowser
+
+*NEW-SMARTOBJECT CustomSmartData&Browser
+TYPE            CustomSmartDataBrowser
+NEW-TEMPLATE    adm2/template/cusbrowser.w
+
+#CustomSmartDataViewer    &Default
+UP-IMAGE-FILE   adeicon/wp_up 0,288
+DOWN-IMAGE-FILE adeicon/wp_down 0,288
+LABEL           CustomSmartDataViewer
+NEW-TEMPLATE    adm2/template/cusviewer.w
+DIRECTORY-LIST  .,adm2
+FILTER          v*.w,v*.r,v*.*,*.*
+TITLE           Choose CustomSmartDataViewer
+
+*NEW-SMARTOBJECT CustomSmartData&Viewer
+TYPE            CustomSmartDataViewer
+NEW-TEMPLATE    adm2/template/cusviewer.w
+
+*NEW-CONTAINER  CustomSmart&Window
+NEW-TEMPLATE    adm2/template/cuscntnrwin.w
+
+*NEW-CONTAINER  CustomSmart&Dialog
+NEW-TEMPLATE    adm2/template/cuscntnrdlg.w
+
+
+*NEW-SMARTOBJECT CustomSmart&Window
+TYPE            CustomSmartWindows
+NEW-TEMPLATE    adm2/template/cuscntnrwin.w
+
+*NEW-SMARTOBJECT CustomSmart&Dialog
+TYPE            CustomSmartDialog
+NEW-TEMPLATE    adm2/template/cuscntnrdlg.w

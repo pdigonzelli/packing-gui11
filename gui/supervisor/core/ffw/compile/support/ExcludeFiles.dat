@@ -1,0 +1,11 @@
+# ExcludeFiles.dat
+#
+# This file contains a list of filenames that will not be
+# included in a compile if they are encountered. Lines beginning 
+# with a "#" are comment lines. Multiple filenames may be entered 
+# on one line using a comma "," delimiter. "\" and "/" will be 
+# converted to either a slash or backslash depending on the OS 
+# to handle portability issues.  Blank lines are allowed. 
+
+index.html
+wk\settest.html,questware\wk\splash.html

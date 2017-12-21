@@ -1,0 +1,221 @@
+if opsys = "UNIX" or opsys = "WIN32" then
+  do:
+     assign propath = vlc_dir_fuentes + lc(vlc_grupo) + "," +
+                      vlc_dir_fuentes + "supervisor,".
+
+     /*---CODIGO---*/
+     if lc(vlc_grupo) = "codigo" then
+      do:
+         find par_bases where
+              par_bases.id_base = "codigo" no-lock.
+
+         if vlc_host = par_bases.id_host then
+           connect value("-pf " + vlc_dir_fuentes + "codigo" + c-sep +
+                         "pd_codigo.pf") no-error.
+         else
+           connect value("-pf " + vlc_dir_fuentes + "codigo" + c-sep +
+                         "pr_codigo.pf") no-error.
+         if not connected("codigo") then
+          do:
+             pause 10.
+             if screen-lines = 22 then
+               view frame frame_inicial_1.
+             else
+               view frame frame_inicial_2.
+             pause 0.
+             view frame frame_titulo.
+             view frame frame_textos.
+             vli_intentos = 3.
+             undo _sale, retry _sale.
+          end.
+      end.
+
+     /*---INVENTARIOS---*/
+     if lc(vlc_grupo) = "inventarios" then
+      do:
+         find par_bases where
+              par_bases.id_base = "inventarios" no-lock.
+
+         if vlc_host = par_bases.id_host then
+           connect value("-pf " + vlc_dir_fuentes + "inventarios" + c-sep +
+                         "pd_inventar.pf") no-error.
+         else
+           connect value("-pf " + vlc_dir_fuentes + "inventarios" + c-sep +
+                         "pr_inventar.pf") no-error.
+         if not connected("inventarios") then
+          do:
+             pause 10.
+             if screen-lines = 22 then
+               view frame frame_inicial_1.
+             else
+               view frame frame_inicial_2.
+             pause 0.
+             view frame frame_titulo.
+             view frame frame_textos.
+             vli_intentos = 3.
+             undo _sale, retry _sale.
+          end.
+      end.
+
+     /*---GERENCIAL---*/
+     if lc(vlc_grupo) = "gerencial" or lc(vlc_grupo) = "tableros" then
+      do:
+         find par_bases where
+              par_bases.id_base = "gerencial" no-lock.
+
+         if vlc_host = par_bases.id_host then
+           connect value("-pf " + vlc_dir_fuentes + "gerencial" + c-sep +
+                         "pd_geren.pf") no-error.
+         else
+           connect value("-pf " + vlc_dir_fuentes + "gerencial" + c-sep +
+                         "pr_geren.pf") no-error.
+         if not connected("gerencial") then
+          do:
+             pause 10.
+             if screen-lines = 22 then
+               view frame frame_inicial_1.
+             else
+               view frame frame_inicial_2.
+             pause 0.
+             view frame frame_titulo.
+             view frame frame_textos.
+             vli_intentos = 3.
+             undo _sale, retry _sale.
+          end.
+      end.
+
+     /*---MARKETING---*/
+     if lc(vlc_grupo) = "marketing" then
+      do:
+         find par_bases where
+              par_bases.id_base = "marketing" no-lock.
+
+         if vlc_host = par_bases.id_host then
+           connect value("-pf " + vlc_dir_fuentes + "marketing" + c-sep +
+                         "pd_market.pf") no-error.
+         else
+           connect value("-pf " + vlc_dir_fuentes + "marketing" + c-sep +
+                         "pr_market.pf") no-error.
+         if not connected("marketing") then
+          do:
+             pause 10.
+             if screen-lines = 22 then
+               view frame frame_inicial_1.
+             else
+               view frame frame_inicial_2.
+             pause 0.
+             view frame frame_titulo.
+             view frame frame_textos.
+             vli_intentos = 3.
+             undo _sale, retry _sale.
+          end.
+      end.
+
+     /*---COMPUTOS---*/
+     if lc(vlc_grupo) = "computos" then
+      do:
+         find par_bases where
+              par_bases.id_base = "computos" no-lock.
+
+         if vlc_host = par_bases.id_host then
+           connect value("-pf " + vlc_dir_fuentes + "computos" + c-sep +
+                         "pd_computos.pf") no-error.
+         else
+           connect value("-pf " + vlc_dir_fuentes + "computos" + c-sep +
+                         "pr_computos.pf") no-error.
+         if not connected("computos") then
+          do:
+             pause 10.
+             if screen-lines = 22 then
+               view frame frame_inicial_1.
+             else
+               view frame frame_inicial_2.
+             pause 0.
+             view frame frame_titulo.
+             view frame frame_textos.
+             vli_intentos = 3.
+             undo _sale, retry _sale.
+          end.
+      end.
+
+     /*---CREDITOS---*/
+     if lc(vlc_grupo) = "creditos" or 
+        lc(vlc_grupo) = "cajas" or 
+        lc(vlc_grupo) = "contabilidad" then
+      do:
+         find par_bases where
+              par_bases.id_base = "creditos" no-lock.
+
+         if vlc_host = par_bases.id_host then
+           connect value("-pf " + vlc_dir_fuentes + "creditos" + c-sep +
+                         "pd_creditos.pf") no-error.
+         else
+           connect value("-pf " + vlc_dir_fuentes + "creditos" + c-sep +
+                         "pr_creditos.pf") no-error.
+         if not connected("creditos") then
+          do:
+             pause 10.
+             if screen-lines = 22 then
+               view frame frame_inicial_1.
+             else
+               view frame frame_inicial_2.
+             pause 0.
+             view frame frame_titulo.
+             view frame frame_textos.
+             vli_intentos = 3.
+             undo _sale, retry _sale.
+          end.
+      end.
+
+     /*---RETORNOS---*/
+     if lc(vlc_grupo) = "retornos" then
+      do:
+         find par_bases where
+              par_bases.id_base = "retornos" no-lock.
+
+         if vlc_host = par_bases.id_host then
+           connect value("-pf " + vlc_dir_fuentes + "retornos" + c-sep +
+                         "pd_retornos.pf") no-error.
+         else
+           connect value("-pf " + vlc_dir_fuentes + "retornos" + c-sep +
+                         "pr_retornos.pf") no-error.
+         if not connected("retornos") then
+          do:
+             pause 10.
+             if screen-lines = 22 then
+               view frame frame_inicial_1.
+             else
+               view frame frame_inicial_2.
+             pause 0.
+             view frame frame_titulo.
+             view frame frame_textos.
+             vli_intentos = 3.
+             undo _sale, retry _sale.
+          end.
+      end.
+
+  end. /*-- END opsys = UNIX or opsys = WIN32 --*/
+
+if vlc_grupo = "stock" then
+ do:
+    input clear.
+    run ../s_stock.p (output salida).
+    if salida = no then
+       return.
+ end.
+
+if vlc_grupo = "compras" then
+ do:
+    input clear.
+    run ../s_compra.p (output salida).
+    if salida = no then
+       return.
+ end.
+
+if vlc_grupo = "sra" then
+ do:
+    input clear.
+    run ../s_sra.p (output salida).
+    if salida = no then
+       return.
+ end.

@@ -1,0 +1,284 @@
+<script language="speedscript">
+/*-----------------------------------------------------------------------*
+  File........: freefiletools.html
+  Version.....: 1.02 - 12/21/2000
+  Description : Replacement for dirlist.w in WebSpeed workshop's webtools.
+  Input Param : <none>
+  Output Param: <none>
+  Author......: S.E. Southwell - BravePoint / USI (770) 449-9696
+  Copyright...: FreeFramework 2000  - http://www.freeframework.org
+  Created.....: 5/10/2000
+  Notes.......:
+ *-----------------------------------------------------------------------*/
+ { ffw/lib/ffw_global.i }     /*PATH SETTINGS AND OTHER GENERAL THINGS*/
+ { ffw/lib/ffpplib.i }
+ { ffw/lib/lognote.i }
+
+/*If in PRODUCTION mode, then bail! */
+IF NOT DevCheck() THEN DO:
+	logNote("Caution","{&file-name} was requested by " + remote_addr + " but could not be run with the agents in Production mode.").
+	ShowErrorScreen("Unable to run showcfg.  Request was logged and will be reviewed.").  
+	RETURN.
+END.
+
+DEFINE TEMP-TABLE tt-file
+ FIELD filename AS CHAR
+ FIELD filetype AS CHAR
+ FIELD filepath AS CHAR
+ INDEX filename IS PRIMARY UNIQUE filename.
+
+&IF "{&OPSYS}" = "WIN32" &THEN 
+	&GLOBAL-DEFINE SLASH ~\
+&ELSE
+	&GLOBAL-DEFINE SLASH ~/
+&ENDIF
+
+DEFINE VAR v-filter 	AS CHAR NO-UNDO.
+define var v-cnt      	AS INTEGER NO-UNDO.
+DEFINE VAR v-directory 	AS CHAR NO-UNDO.
+DEFINE VAR v-errmsg		AS CHAR NO-UNDO.
+define var v-filename 	as char no-undo.
+define var v-filepath 	as char no-undo.
+define var v-filetype 	as char no-undo.
+DEFINE VAR v-isIE       AS LOGICAL NO-UNDO.
+DEFINE VAR v-speedscripttypes AS CHAR NO-UNDO.
+DEFINE VAR v-showCVS    AS LOGICAL INIT TRUE NO-UNDO.
+
+ASSIGN
+ v-filter = GET-VALUE("filter")
+ v-directory = GET-VALUE("directory")
+ v-isIE = TRUE WHEN INDEX(HTTP_USER_AGENT,"MSIE") > 0 
+ v-speedscripttypes = "*" + REPLACE(GetAgentSetting("SpeedScriptTypes"),",","~;*") 
+.
+
+IF GetAgentSetting("FF.IgnoreCVSDir") = "yes" THEN ASSIGN v-showCVS = FALSE.
+
+ASSIGN FILE-INFO:FILE-NAME = v-directory.
+IF FILE-INFO:FULL-PATHNAME = ? THEN DO:
+	ASSIGN
+	 v-errmsg = "The directory '" + v-directory  + "' does not exist.".
+	 v-directory = &IF "{&WEB_CONTEXT_EXCLUDE}" = "YES" &THEN {&AGENT_WORK_DIR} &ELSE get-config("workDir") &ENDIF
+	.
+END.
+ELSE ASSIGN v-directory = FILE-INFO:FULL-PATHNAME.
+
+IF v-filter = "" THEN ASSIGN v-filter = '*.w;*.p~;*.i~;*.htm~;*.html'.
+
+/* If no directory specified */
+IF v-directory = "" THEN ASSIGN v-directory = 
+&IF "{&WEB_CONTEXT_EXCLUDE}" = "YES" &THEN
+{&AGENT_WORK_DIR}.
+&ELSE
+get-config("workDir").
+&ENDIF
+
+/* ||| Index below is a problem. */
+DO ON ERROR UNDO, LEAVE.
+input from os-dir(v-directory).
+repeat:
+    create tt-file.
+	import tt-file.filename tt-file.filepath tt-file.filetype NO-ERROR.
+    IF ERROR-STATUS:ERROR THEN LEAVE.
+	if tt-file.filename = ".." then
+     assign
+        tt-file.filetype = "D"
+	    tt-file.filepath = substring(tt-file.filepath,1,r-index(tt-file.filepath,"{&slash}",max(r-index(tt-file.filepath,"{&slash}") - 1,1)))
+	    tt-file.filename = ".. [Parent Directory]"
+	    .
+    if tt-file.filename = "." then delete tt-file.
+end. /*repeat*/
+input close.
+END. /*DO*/
+IF NOT CAN-FIND (FIRST tt-file) THEN DO:
+    assign v-errmsg = "The WebSpeed broker does not have correct permissions to view this directory.".
+    create tt-file.
+    assign
+     tt-file.filetype = "D"
+	 tt-file.filepath = substring(v-directory,1,r-index(v-directory,"{&slash}"))
+	 tt-file.filename = ".. [Parent Directory]"
+	.
+END.
+</script>
+<html>
+<head>
+  <title>FreeFramework File Tools</title>
+    <script language="JavaScript">
+        var imagePath = "`ffimages`";
+        function setFilter (index, target, opt) { 
+            target.value = opt.value; 
+        }
+        function SubmitForm (todo) {
+            var f = document.FileList;
+            // Is a file selected?
+            if ((f.Filename == null) || f.Filename.selectedIndex == -1 || f.Filename.selectedIndex == (f.Filename.length - 1)) {
+            window.alert('Please select a file.'); 
+            }
+            // Confirm deletion?
+            else if (todo != "Delete" || window.confirm("Are you sure you want to delete the selected files?")) {
+              f.FileAction.value = todo;
+              f.submit();
+            }
+        }
+        function selectAllFiles() {
+            var i = 0;
+            with (document.FileList) {
+                for (i=0;i<Filename.length - 1;i++) {
+                    Filename.options[i].selected = true;
+                }
+            }
+        }
+        function invertSelect() {
+            var i = 0;
+            with (document.FileList) {
+                for (i=0;i<Filename.length - 1;i++) {
+                    Filename.options[i].selected = !Filename.options[i].selected;
+                }
+            }
+        }
+    
+    </script>
+	<link rel="STYLESHEET" type="TEXT/CSS" href="`ffstyles`freestyle.css">
+</head>
+<body background="`ffimages`lyellow.gif">
+<form method="POST" action="freefiletools.html" style="padding: 0; margin: 0;" name="fildir">
+<table border="0" width="100%" cellspacing="0">
+<tr>
+    <td align="LEFT">
+    	<span class="sechdr">Free<br>File Tools</span>
+    </td>
+    <td><font size="-1">
+    	<b>File Filter:</b>
+    	<input type="TEXT" name="filter" size="20" value="`v-filter`" class="datafield">
+    	<input type="SUBMIT" value="List" name="ListF" class="datafield"><br>
+    	<b>Filter Options:</b>
+    	<select name="filtertype" size="1" onChange="document.fildir.filter.value = this.options[this.selectedIndex].value; document.fildir.ListF.click();"> 
+    	<option`(if v-filter = "*.w;*.p;*.i" then " selected" else "")` value="*.w;*.p;*.i"> Webspeed Files (*.w;*.p;*.i)</option>
+    	<option`(if v-filter = v-speedscripttypes then " selected" else "")` value="`v-speedscripttypes`"> SpeedScript (`v-speedscripttypes`)</option>
+    	<option`(if v-filter = "*.w;*.p;*.i;*.htm;*.html" then " selected" else "")` value="*.w;*.p;*.i;*.htm;*.html">All Sources (*.w;*.p;*.i;*.htm;*.html)</option>
+    	<option`(if v-filter = "*" then " selected" else "")` value="*"> All Files (*)</option>
+    	</select></font>
+    </td>
+</tr>
+</table>
+<% if v-errmsg ne "" then do: %>
+<span class="error">`v-errmsg`</span>
+<% end. %>
+<table border="1" cellpadding="4" cellspacing="0" width="500">
+<tr valign="top" bgcolor="#cccccc">
+	<td colspan="3" align="left" nowrap>
+		Contents of:&nbsp;<input type="text" 
+		name="directory" class="dirspec" 
+		title="The name of the directory being viewed." 
+		value="`html-encode(v-directory)`" 
+		<% if v-isIE then do: %>
+		style="width: 275pt;"
+		<% end. else do: %>
+		size="35"
+		<% end. %>
+		onchange="document.fildir.submit();" 
+		>
+        <input type="image" src="`ffimages`refresh.gif" border="0" alt="Refresh View" align="absbottom">
+    </td>
+</tr>
+</table>
+</form>
+<form name="FileList" method="POST" action="freefileact.html"> 
+<input type="HIDDEN" name="Directory" value="`v-directory`">
+<input type="HIDDEN" name="FileAction" value="">
+<input type="HIDDEN" name="filter" value="`v-filter`">
+<table border="1" cellpadding="4" cellspacing="0" width="500">
+<tr valign="TOP" bgcolor="#CCCCCC"><td bgcolor="WHITE">
+<% if v-isIE then do: %>
+<div style="width: 150; overflow: scroll; position: relative; height: 250px; margin: 0px">
+<% end. else if getAgentSetting("FF.NetscapeJSFileScroll") ne "off" then do: 
+{&out} '<script language="Javascript1.2" src="' ffjspath 'scrollable.js"></script>'.
+%>
+<script language="javascript" type="text/javascript">
+var c = null;
+</script>
+<layer name="dirlist" clip="150,250" left="0" top="0" visibility="hidden">
+<% end. %>
+<% for each tt-file: %>
+	<% if index(tt-file.filetype,"D") > 0 AND tt-file.filename ne "." 
+        AND (v-showCVS OR tt-file.filename ne "CVS") then do: %> 
+<a href="freefiletools.html?directory=`url-encode(tt-file.filepath,"query")`&filter=`url-encode(v-filter,"query")`" class="dirlink"><img src="`ffimages``(if tt-file.filename BEGINS ".." then "uplevel.gif" else "folder.gif")`" border=0 width=15 height=12>&nbsp;`tt-file.filename`</a><br>
+	<% end. %>
+<% end. /*each tt-file*/ %>
+<% if v-ISIE then do: %>
+</div>
+<% end. else if getAgentSetting("FF.NetscapeJSFileScroll") ne "off" then do: %>
+</layer>
+<ilayer name="dirpos" width="150" height="250">
+</ilayer>
+<% end. %>
+</td>
+<td align="left" bgcolor="WHITE" class="fileselect"><select name="Filename" multiple size="15" class="fileselect">
+<% for each tt-file: %>
+	<% if index(tt-file.filetype,"D") = 0 and tt-file.filename ne "" THEN DO:
+		FILTBLOCK: DO v-cnt = 1 to NUM-ENTRIES(v-filter,";"):
+			IF tt-file.filename matches replace(ENTRY(v-cnt,v-filter,";"),".","~~.") then do: %> 
+<option value="`tt-file.filename`">`tt-file.filename`</OPTION> 
+			<% leave FILTBLOCK.
+			end. /*matches the filter*/ 
+		END. /*each entry of the filter*/ %>
+	<% end. /*not a directory*/ %>
+<% end. %>
+<option value="">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</select>
+<img src="`ffimages`cleardot.gif" height="1" width="110"><br>
+<a href="#top" onclick="selectAllFiles(); return false;" class="smalllink">[Select All]</a>&nbsp;&nbsp;
+<a href="#top" onclick="invertSelect(); return false;" class="smalllink">[Invert Selection]</a>
+</td>
+	<td align="CENTER">
+		<table>
+		<tr valign="top">
+			<td align="center">
+				<a href="#" onClick="if (window.SubmitForm) SubmitForm('View'); return false;"
+                   onMouseOver="window.status='View the file'; return true;"
+                   onMouseOut="window.status=''; return true;"><img src="`ffimages`u-view.gif" alt="View" border="0"></a><br>   
+				<a href="#" onclick="if (window.SubmitForm) SubmitForm('Run'); return false;"
+				   onMouseOver="window.status='Run the selected file, if possible.'; return true;"
+				   onMouseOut="window.status=''; return true;"><img src="`ffimages`u-run.gif" alt="Run" border="0"></a><br>
+				<a href="#" onclick="if (window.SubmitForm) SubmitForm('Compile'); return false;"
+				   onMouseOver="window.status='Compile all selected files.'; return true;"
+				   onMouseOut="window.status=''; return true;"><img src="`ffimages`u-compil.gif" alt="Compile" border="0"></a><br>   
+				<a href="#" onclick="if (window.SubmitForm) SubmitForm('TagExtract'); return false;"
+				   onMouseOver="window.status='Create .off files for selected HTML files.'; return true;"
+				   onMouseOut="window.status=''; return true;"><img src="`ffimages`u-tagext.gif" alt="Extract Offset File" border="0"></a><br>   
+				<a href="#" onclick="if (window.SubmitForm) SubmitForm('Delete'); return false;"
+				   onMouseOver="window.status='Delete all selected files.'; return true;"
+				   onMouseOut="window.status=''; return true;"><img src="`ffimages`u-delete.gif" alt="Delete" border="0"></a>  
+			</td>
+			<td align="center">
+				<a href="#" onclick="if (window.SubmitForm) SubmitForm('Xref'); return false;"
+				   onMouseOver="window.status='Create and view a cross-reference (X-ref) file.'; return true;"
+				   onMouseOut="window.status=''; return true;"><img src="`ffimages`xref.gif" alt="Xref" border="0" width="28" height="43"></a><br>   
+				<a href="#" onclick="if (window.SubmitForm) SubmitForm('Dependencies'); return false;"
+				   onMouseOver="window.status='Display all dependencies for a given file.'; return true;"
+				   onMouseOut="window.status=''; return true;"><img src="`ffimages`depends.gif" alt="Dependencies" border="0" width="40" height="42"></a><br>   
+				<a href="#" onclick="if (window.SubmitForm) SubmitForm('Backup'); return false;"
+				   onMouseOver="window.status='Create a backup copy of a given file.'; return true;"
+				   onMouseOut="window.status=''; return true;"><img src="`ffimages`backup.gif" alt="Backup" border="0" width="34" height="43"></a>   
+				<%/*
+                <a href="#" onclick="if (window.SubmitForm) SubmitForm('Search'); return false;"
+				   onMouseOver="window.status='Search for occurences of a given text string in the selected files or directories.'; return true;"
+				   onMouseOut="window.status=''; return true;"><img src="`ffimages`search.gif" alt="Search" border="0" width="35" height="32"></a><br>
+				<a href="#" onclick="if (window.SubmitForm) SubmitForm('Compare'); return false;"
+				   onMouseOver="window.status='Compare two files.'; return true;"
+				   onMouseOut="window.status=''; return true;"><img src="`ffimages`compare.gif" alt="Compare" border="0" width="43" height="35"></a><br>   
+			    */%>
+            </td>
+		</tr>
+		</table>
+	</td>
+</tr>
+</table>
+</form>
+<% if not v-isIE and getAgentSetting("FF.NetscapeJSFileScroll") ne "off" then do: %>
+<script language=javascript>
+  if (c == null) c = new Scrollable(document.dirlist);
+  setInterval("c.layer.moveToAbsolute(document.dirpos.pageX, document.dirpos.pageY); c.layer.visibility = 'show'; c.main.visibility = 'show';",500);
+</script>
+<% end. %>
+</body>
+</html>

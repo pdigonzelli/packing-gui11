@@ -1,0 +1,50 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+       "http://www.w3.org/TR/xhtml1/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Tech Summit</title>
+  <style type="text/css">
+    body {font-family: tahoma, verdana, arial; font-size: 10pt; text-align: center}
+    table {background: black; border: 1px solid #000000 }
+    td {background: white; white-space: nowrap;}
+    th {background: black; color: white;}
+  </style>
+</head>
+<body>
+<%include:html/header.html%>
+<%setMaxRows(20)%>
+<form method="post" action="custsrch.p">
+  Name: <input type="text" name="searchValue" value="<%=get-field(searchValue)%>" />
+        <input type="submit" name="btSumbit" value="Search" />
+</form>
+
+<table border="0" cellspacing="1" cellpadding="2">
+  <thead>
+  <tr>
+    <th>Customer Number</th>
+    <th>Name</th>
+    <th>Phone</th>
+    <th>Contact</th>
+    <th>Balance</th>
+  </tr>
+  </thead>
+  <tbody>
+<%while:listResults()%>
+  <tr>
+    <td><%=getData(CustNum)%></td><td><%=getData(Name)%></td><td><%=getData(Phone)%></td>
+    <td><%=getData(Contact)%></td><td><%=getData(Balance)%></td>
+  </tr>
+<%end:listResults%>
+  </tbody>
+<%if:hasMoreRows()%>
+  <tfoot>
+    <tr>
+      <td colspan="5" align="right"><a href="">more...</a></td>
+    </tr>
+  </tfoot>
+<%end:hasMoreRows%>
+
+</table>
+<%include:html/footer.html%>
+</body>
+</html>

@@ -1,0 +1,34 @@
+ El volumen de la unidad C no tiene etiqueta.
+ El n£mero de serie del volumen es: B47F-1EEA
+
+ Directorio de C:\DLC82B\custom\template
+
+08/04/99  09.25         <DIR>          .
+08/04/99  09.25         <DIR>          ..
+17/12/98  15.12                  1.541 00004571
+22/12/98  23.34                 20.087 cabm.w
+22/12/98  23.35                 37.590 cabmcd.old.w
+13/02/99  12.08                 40.056 cabmcd.w
+31/03/99  19.14                 49.238 cabmcdi.w
+22/12/98  23.36                 22.662 cabmf.w
+25/04/98  15.40                 32.941 cfolder.r
+22/12/98  23.40                 27.783 cfolder.w
+17/12/98  13.08                  9.444 cquerycons.w
+22/12/98  23.18                 20.608 csmartb.w
+15/12/98  20.38                 19.896 csmartbcd.w
+02/11/98  13.00                 14.929 csmartbe.w
+08/12/98  14.55                 17.732 csmartv.w
+03/12/98  12.33                 15.741 csrepw.w
+23/10/98  06.17                 43.549 csupds.r
+18/12/98  10.43                 15.163 cswin.w
+23/10/98  07.00                  6.492 cusreg.w
+22/12/98  23.37                 16.480 cwin.w
+25/04/98  13.57                 32.840 folder.r
+14/09/98  17.58                 17.156 p14342cf.qs
+14/09/98  17.58                    391 p14342cf.qs2
+08/04/99  09.25                      0 ver.txt
+21/08/98  18.29                 13.853 wmaster.w
+21/09/98  21.04                  2.337 xftr.p
+21/09/98  21.04                  1.434 xftr.r
+              27 archivos        479.943 bytes
+                            362.323.456 bytes libres

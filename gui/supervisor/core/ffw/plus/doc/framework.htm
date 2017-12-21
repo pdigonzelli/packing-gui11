@@ -1,0 +1,102 @@
+<html><head>
+<title>Application Framework</title>
+</head><body BGCOLOR="#FFFFFF">
+
+<h1><font COLOR="#000080" FACE="MS Sans Serif"><img
+SRC="/webspeed31A/doc/wshelp/images/helpbook.gif" WIDTH="53" HEIGHT="40">
+ Application Framework</font></h1>
+
+<hr SIZE="4" COLOR="#0000FF">
+
+<p><font SIZE="2" FACE="Arial">Application Framework contains a special start-up
+program &quot;plus/web-disp.p&quot; and an include file for the function
+definitions plus/session.i. You have to configure the Webspeed startup procedure
+to be &quot;plus/web-disp.p&quot; rather than the default &quot;web/objects/web-disp.p&quot;
+to use any of the enhanced functionality. Then you can turn on the features you
+like by setting the environment variables (the last item on the Webspeed Broker
+Properties dialogbox.)&nbsp;</font></p>
+
+<p><font SIZE="2" FACE="Arial">It contains the following interface elements:</font></p>
+
+<p>&nbsp;</p>
+
+<h2>Automatic SessionID Cookie</h2>
+<p>This ensures that the logging and other features will stay within the context
+of each web-browser, the users application context. The default name is &quot;plusSessID&quot;,
+and its value is accessible through the global variable &quot;plusSession&quot;.
+The cookie value is automatically assigned with random value if it isn't already
+set.</p>
+<p>ENV:&nbsp; plusOptions = session<br>
+ENV:&nbsp; plusPrefix = ASPSESSIONID&nbsp;&nbsp;&nbsp; /** for use with ASP **/</p>
+<p>If plusPrefix is set it will scan the cookies for the given string and use
+the corresponding value, instead of creating its own Webspeed SessionID. For
+server-side scripting in conjunction with Webspeed like ASP or JSP or simply by
+using the Session tracking feature of MsSiteServer you might want to use the
+cookies already generated.<br>
+</p>
+<p>This feature is necessary for session logs and global/session variables.</p>
+<h2>Session and global variables</h2>
+<p><b>GLOBAL:<br>
+</b>This gives you truly global variables that when set by one agent will be the
+same for all agents, un like Webspeed &quot;DEF NEW SHARED GLOBAL&quot;. The
+globals can be used for system specific things like an administrator can
+disallow certain features by setting variables and it will immediately happen
+sitewide. This is variables which traditionally have been put in a database. The
+global context is stored in the global.tmp file in the logs directory.</p>
+<p><b>SESSION:<br>
+</b>The session variables will be unique to the user, such as username, usertype,
+etc. Traditionally this has been done by database tables but this does not
+require a database table because its session-context is stored in a *.tmp file
+in the logs directory.&nbsp;&nbsp;</p>
+<p>ENV: plusOptions = session<br>
+ENV: plusLog = /usr/myapp/logs/<br>
+INCLUDE: {plus/session.i}</p>
+<p>Available Functions:</p>
+<ul>
+  <li>plusGetSession(&quot;name&quot;), returns the string of the session
+    variable with &quot;name&quot;. (just like a GET-VALUE).</li>
+  <li>plusGetSession(?), returns a comma-delimited list with all the name's.
+    (just like GET-VALUE)</li>
+  <li>plusSetSession(&quot;name&quot;,value), sets the session variable of
+    &quot;name&quot; with value. (just like SET-USER-FIELD).</li>
+  <li>plusGetGlobal(&quot;name&quot;), returns the string of the global variable
+    with &quot;name&quot;. (just like a GET-VALUE).</li>
+  <li>plusGetGlobal(?), returns a comma-delimited list with all the name's.
+    (just like GET-VALUE)</li>
+  <li>plusSetGlobal(&quot;name&quot;,value), sets the global variable of
+    &quot;name&quot; with value. (just like SET-USER-FIELD).</li>
+</ul>
+<h2>Debugging / Session logs</h2>
+<p>Each session will have its own log, meaning that the user's context is
+preserved throughout the log. The log automatically generates start &amp; stop
+lines&nbsp; for each web-request giving the PID, broker, WSEU, time, date,
+program-name etc and the time to execute in ms. For each plusLog(&quot;message&quot;)
+it will contain the relative time in milliseconds, the procedure name and the
+message. This is very useful for performance tuning, debugging or simply logging
+what the user did on your site.&nbsp;</p>
+<p>The logs (example <a href="00000084709caiTiPddbcDakbEl.log">00000084709caiTiPddbcDakbEl.log</a>)
+can be easily viewed by &quot;plus/viewlogs&quot; which will output the current
+session's log to the screen.&nbsp;</p>
+<p>ENV: plusOptions = session,log<br>
+ENV: plusLog = /usr/myapp/logs/<br>
+INCLUDE: {plus/session.i}</p>
+<ul>
+  <li>plusLog(&quot;message&quot;)</li>
+</ul>
+<h2>Automatic reconnect</h2>
+<p>This feature can be useful if the agents occasionally lose connections to the
+databases, for whatever reason.&nbsp;&nbsp; It uses a pipe delimited list of
+databases with logical name, connection parameters, like as in the sample below.</p>
+<p>ENV: plusConnect = sports,-db sports.db -H localhost -N tcp -S
+sports|sports2000,-db sports2000.db -H localhost -N tcp -S sports2000</p>
+<h2>Compile on the fly&nbsp;</h2>
+<p>This feature is very useful for SpeedScript development since it doesn't
+require you to compile the files in the workshop. It automatically detects a
+changed sourcefile (compares modified date with the rcode) and recompiles when
+changed.&nbsp;</p>
+<p>ENV: plusOptions = compile</p>
+
+<HR>
+<p><a href="index.htm">Main index</a></p>
+</body>
+</html>

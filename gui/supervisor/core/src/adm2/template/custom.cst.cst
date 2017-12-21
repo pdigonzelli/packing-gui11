@@ -1,0 +1,13 @@
+#CustomSmartDataObject &Default
+UP-IMAGE-FILE    adeicon/wp_up 24,288
+DOWN-IMAGE-FILE  adeicon/wp_down 24,288
+LABEL            CustomSmart&DataObject
+DB-CONNECT
+NEW-TEMPLATE     adm2/template/cusdata.w
+DIRECTORY-LIST   .,adm2
+FILTER           d*.w,d*.r,d*.*,*.*
+TITLE            Choose CustomSmartDataObject
+
+*NEW-SMARTOBJECT CustomSmart&DataObject
+TYPE		 CustomSmartDataObject
+NEW-TEMPLATE     adm2/template/cusdata.w

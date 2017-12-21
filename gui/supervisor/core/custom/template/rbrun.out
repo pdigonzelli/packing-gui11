@@ -1,0 +1,4 @@
+[articulos]
+RO-ERROR-CODE=R
+RO-ERROR-MESSAGE=Unable to connect to database.  Database error is: Desconectado del servidor porque el nombre de la base de datos era incorrecto. (437)  ** El servidor ha rechazado el inicio de sesion. (700)
+RO-PAGES=0

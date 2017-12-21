@@ -1,0 +1,54 @@
+Object life:
+1. Initial Check-in   (add to RCS)
+   - local copy copied from working directory to RCS repository
+   - file,v created in RCS initial check-in New revision level given.
+   - local copy unlocked
+   - revision id stored in TASK
+
+2. Temp check-in
+   - local copy copied from working directory to RCS repository
+   - file,v updated in RCS initial check-in
+   - local copy unlocked
+   - revision id stored in TASK
+
+3. Completing TASK.
+   - perform RCSclean to check if file has changed if then Warning "File needs to be checked in".
+   - compile
+   - file,v RCS check-out  LOCKED
+   - local copy and R-code moved to central repository
+   - "COMPLETED" stored in TASK
+
+4. Pushing TASK to next workspace.
+   - check-out first revision of object in task.
+   - check-out last  revision of object in task.
+   - merge current object with first to last revision of task.
+   - workspace.ini file updated with new entry. 
+
+5. Pulling TASK back from workspace.
+   - check-out first revision of object in task.
+   - check-out last  revision of object in task.
+   - merge current object with last to first revision of task.
+   - workspace.ini file updated with removed entry. 
+
+6. TASK deployed.
+   - TASK removed from workspaces and added to "deployed.ini".
+
+7. TASK deleted.
+   - TASK removed from workspaces and added to "deleted.ini" (May be assigned to local brokers, appman.ini).
+
+9. Object, reverse changes.
+   - Check-out given revision with UNLOCKED .
+
+
+There is always a stored LOCKED copy of recent code worked on in RCS dir.
+ 
+
+TODO:
+
+1. Create several local users.
+2. Read a checked-out list task.
+3. Read/write the checked-out list task.
+4. Create error-handling  (as for file is already checked out)
+5. Create MOVE to CENTRAL on FINAL check-in.
+6. Create RCS-Merge and Recompile on Workspaces. 
+

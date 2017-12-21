@@ -1,0 +1,105 @@
+<script language="speedscript">
+/*-----------------------------------------------------------------------*
+  File........: freefileact.html
+  Version.....: 1.04 - 12/21/2000
+  Description : Perform actions on files from the freefiletools.html object
+  Input Param : <none>
+  Output Param: <none>
+  Author......: S.E. Southwell - BravePoint / USI (770) 449-9696
+  Copyright...: FreeFramework 2000  - http://www.freeframework.org
+  Created.....: 5/4/2000
+  Notes.......:
+ *-----------------------------------------------------------------------*/
+{ ffw/lib/ffw_global.i }                    /*PATH SETTINGS AND OTHER GENERAL THINGS*/
+{ ffw/lib/ffpplib.i }
+{ ffw/lib/lognote.i }
+
+/*If in PRODUCTION mode, then bail! */
+
+IF NOT devCheck() THEN DO:
+	logNote("Caution","{&file-name} was requested by " + remote_addr + " but could not be run with the agents in Production mode.").
+	ShowErrorScreen("Unable to run {&file-name}.  Request was logged and will be reviewed.").  
+	RETURN.
+END.
+
+DEFINE VAR v-directory 	AS CHAR NO-UNDO.
+DEFINE VAR v-fileaction AS CHAR NO-UNDO.
+DEFINE VAR v-filename 	AS CHAR NO-UNDO.
+DEFINE VAR v-errmsg     AS CHAR NO-UNDO.
+
+ASSIGN
+ v-fileaction = GET-VALUE("fileaction")
+ v-directory = GET-VALUE("directory")
+.
+
+CASE v-fileaction: /*run compile tagExtract delete xref search compare dependencies backup*/
+	WHEN "run"
+	OR WHEN "tagextract"
+	THEN DO:
+		RUN webtools/fileact.w.
+		RETURN.	
+	END.
+	WHEN "compile" THEN DO:
+		RUN run-web-object IN web-utilities-hdl("webtools/freecompile.html").
+		RETURN.
+    END.
+	WHEN "xref" THEN DO:
+		RUN run-web-object IN web-utilities-hdl("webtools/freexref.html").
+		RETURN.
+	END. 
+	WHEN "delete" THEN DO:
+		RUN run-web-object IN web-utilities-hdl("webtools/freedelete.html").
+		RETURN.
+	END. 
+	WHEN "view" THEN DO:
+		RUN run-web-object IN web-utilities-hdl("webtools/freeview.html").
+		RETURN.
+	END. 
+	WHEN "dependencies" THEN DO:
+		RUN run-web-object IN web-utilities-hdl("webtools/freedep.html").
+		RETURN.
+	END. 
+	WHEN "backup" THEN DO:
+		RUN run-web-object IN web-utilities-hdl("webtools/freebackup.html").
+		RETURN.
+	END. 
+	OTHERWISE DO:
+		ASSIGN v-errmsg = 'The feature you requested: <i>"' + v-fileaction + '"</i> is not yet available.'.
+	END.
+
+
+END CASE. /*v-fileaction*/
+
+</script>
+<html>
+<head>
+	<title>FreeFramework File Tools</title>
+	<link rel="STYLESHEET" type="TEXT/CSS" href="`ffstyles`freestyle.css">
+</head>
+
+<body background="`ffimages`ff/wsbgr.gif" bgcolor="#ccffff" text="#990000" link="#660066" vlink="#990000" alink="#990000">
+<table border="0" width="100%" cellspacing="0">
+<tr>
+	<td align="LEFT">
+		<span class="sectionname">Free<br>File Tools</span>
+	</td>
+	<td align= "RIGHT">
+	<a href="freefiletools.html?directory=`v-directory`" onClick="history.back(); return false;">[Back to File Tools]</a>
+	</td>
+</tr>
+</table>
+<!--wss if v-errmsg ne "" then do: -->
+<span class="error">`v-errmsg`</span></br>
+<!--wss end. -->
+
+</body>
+</html>
+
+<script language="speedscript">
+PROCEDURE output-headers:
+    OUTPUT-HTTP-HEADER("Cache-Control","no-cache").
+    OUTPUT-HTTP-HEADER("Pragma","no-cache").
+    OUTPUT-CONTENT-TYPE("text/html").
+END. /*output-header*/
+</script>
+

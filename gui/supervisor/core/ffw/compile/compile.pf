@@ -1,0 +1,4 @@
+# Parameter file for FFW/Bob Mirro application compiler.
+# You may want to set a temp path.
+#  -T c:\webspeed\compile\temp  
+

@@ -1,0 +1,105 @@
+<HTML><HEAD><TITLE>Data Browser</title>
+ </HEAD>
+ <BODY BGCOLOR="#FFFFFF">
+
+ <H1><FONT COLOR="#000080" FACE="MS Sans Serif"><IMG
+ SRC="/webspeed31A/doc/wshelp/images/helpbook.gif" WIDTH="53" HEIGHT="40">
+ Data Browser</font></H1>
+
+ <HR SIZE="4" COLOR="#0000FF">
+
+ <P><FONT SIZE="2" FACE="Arial">DataBrowser allows you to work with the actual contents of
+ the database:</font>
+
+ <DL>
+   <DT><FONT FACE="Arial" SIZE="4"><STRONG>Main Menu</strong></FONT></DT>
+   <DD>Main menu has a drop down box for every database, and displays the physical path too.</dd>
+   <DT><FONT SIZE="2" FACE="Arial"><STRONG>Files </STRONG></FONT></DT>
+   <DD><FONT SIZE="2" FACE="Arial">The database files are listed in the drop down list, one for
+     each database. When one is selected the DataBrowser will immediately take you to the
+     Record browse table.</font></DD>
+   <DT><FONT SIZE="2" FACE="Arial"><STRONG>Options: Report </STRONG></FONT></DT>
+   <DD><FONT SIZE="2" FACE="Arial">By clicking on the physical database in the third column it
+     will create an HTML-formatted Dictionary print. This report will file by file
+     alphabetically list all fields and indexes and their type, format, label, column-label.
+     This report is useful for printing and using as a desktop reference to the database.</font></DD>
+   <DT><FONT SIZE="2" FACE="Arial"><STRONG>Options: Virtual System Tables</strong></FONT></DT>
+   <DD><FONT SIZE="2" FACE="Arial">This will only be accessible if the database has been set up
+     to provide them. This is essentially PROMON information, accessed through the database
+     fields and not through shared memory. Some useful information can be found here, like the
+     buffer hit-rate etc. This feature is will be fully implemented in later versions.</font></DD>
+ </DL>
+
+ <DL>
+   <DT><FONT FACE="Arial" SIZE="4"><STRONG>Select Record (browse)</strong></FONT></DT>
+   <DD><FONT SIZE="2" FACE="Arial">This object will list eight columns of data fields from the
+     data file in ten rows at a time. It will also let you navigate, search and sort through
+     the dataset by available indexes.</font></DD>
+ </DL>
+
+ <DL>
+   <DT><FONT SIZE="2" FACE="Arial"><STRONG>Navigation links: (First,Prev,Next,Last)</strong></FONT></DT>
+   <DD><FONT SIZE="2" FACE="Arial">These buttons will let you navigate through the current
+     dataset.</font></DD>
+   <DT><FONT SIZE="2" FACE="Arial"><STRONG>Select File.</strong></FONT></DT>
+   <DD><FONT SIZE="2" FACE="Arial">Bring you back to the Main Menu.</font></DD>
+   <DT><FONT SIZE="2" FACE="Arial"><STRONG>Add.</strong></FONT></DT>
+   <DD><FONT SIZE="2" FACE="Arial">Brings you to the edit screen with a newly created record
+     for you to modify.</font></DD>
+   <DT><FONT SIZE="2" FACE="Arial"><STRONG>Count.</strong></FONT></DT>
+   <DD><FONT SIZE="2" FACE="Arial">By pressing Count it will count all records and then you
+     will be able to see (x to x+10 out of yy) information when using the browser.</font></DD>
+ </DL>
+
+ <DL>
+   <DT><FONT SIZE="2" FACE="Arial"><STRONG>Find xxxxxxx where (index-field)</strong></FONT></DT>
+   <DD><FONT SIZE="2" FACE="Arial">This is a drop down list of the first index field in various
+     indexes. By selecting an index you can set the sorting order.</font></DD>
+   <DT><FONT SIZE="2" FACE="Arial"><STRONG>Find xxxxxxx where index-field (value)</strong></FONT></DT>
+   <DD><FONT SIZE="2" FACE="Arial">By specifying the value here you can filter by a begins
+     value for character fields or equals value for integers, logical for logical fields and so
+     on.</font></DD>
+   <DT><STRONG><FONT SIZE="2" FACE="Arial">GO</font></STRONG></DT>
+   <DD><FONT SIZE="2" FACE="Arial">Executes the query entered.</font></DD>
+   <DT><FONT SIZE="2" FACE="Arial"><STRONG>Edit data record.</strong></FONT></DT>
+   <DD><FONT SIZE="2" FACE="Arial">By clicking the first column of the records datarow</font></DD>
+ </DL>
+
+ <DL>
+   <DT><FONT FACE="Arial" SIZE="4"><STRONG>Edit Record (detail)</strong></FONT></DT>
+   <DD><FONT SIZE="2" FACE="Arial">This object will list all data fields from the data record,
+     let you edit and save it. You can also delete and create new records.</font></DD>
+   <DT><FONT SIZE="2" FACE="Arial"><STRONG>Edit fields</strong></FONT></DT>
+   <DD><FONT SIZE="2" FACE="Arial">View and edit the fields of the record.</font></DD>
+   <DT><FONT SIZE="2" FACE="Arial"><STRONG>Save.</strong></FONT></DT>
+   <DD><FONT SIZE="2" FACE="Arial">Store the modifications and go back to Select Record.</font></DD>
+   <DT><FONT SIZE="2" FACE="Arial"><STRONG>Reset.</strong></FONT></DT>
+   <DD><FONT SIZE="2" FACE="Arial">Reset values to what it was.</font></DD>
+   <DT><FONT SIZE="2" FACE="Arial"><STRONG>Back.</strong></FONT></DT>
+   <DD><FONT SIZE="2" FACE="Arial">Just go back to the Select Record screen.<br>
+     </FONT></DD>
+   <DT><FONT SIZE="2" FACE="Arial"><STRONG>Delete.</strong></FONT></DT>
+   <DD><FONT SIZE="2" FACE="Arial">Delete the record and go back to the Select Record screen.</font></DD>
+ </DL>
+
+ <P>&nbsp;</p>
+
+ <P><FONT SIZE="2" FACE="Arial">NOTES:</font></P>
+
+ <P><FONT SIZE="2" FACE="Arial"><STRONG>Add-Record</strong> When records are created they
+ will be initialized with its default values and depending on the dataset values will be
+ created for index fields in order to keep them unique. However there is several problems
+ with data-types like ROWID, and the more testing is definitely needed. It seems to work
+ fine and it shouldn't be a problem often.</font></P>
+
+ <P><FONT SIZE="2" FACE="Arial"><STRONG>Index-field</strong> The index-field is the first
+ field of an index and sometimes I have seen it does not sort and filter right. It is nice
+ to have this functionality working 100%, but it is not necessary functionality and can be
+ hard to debug so I have delayed this one.</font></P>
+
+<p>&nbsp;</p>
+
+<HR>
+<p><a href="index.htm">Main index</a></p>
+ </BODY>
+ </HTML>

@@ -1,0 +1,125 @@
+<script language="speedscript">
+/*-----------------------------------------------------------------------*
+  File........: freedep.html
+  Version.....: 1.04 - 10/5/01
+  Description : View text files
+  Input Param : <none>
+  Output Param: <none>
+  Author......: S.E. Southwell - BravePoint, Inc. (770) 449-9696
+  Copyright...: FreeFramework 2001  - http://www.freeframework.org
+  Created.....: 10/5/01
+  Notes.......:
+ *-----------------------------------------------------------------------*/
+{ ffw/lib/ffw_global.i }                    /*PATH SETTINGS AND OTHER GENERAL THINGS*/
+{ ffw/lib/ffpplib.i }
+{ ffw/lib/lognote.i }
+{ ffw/lib/filetools.i }
+
+DEFINE VAR v-directory 	  AS CHAR NO-UNDO.
+DEFINE VAR v-filename	  AS CHAR NO-UNDO.
+DEFINE VAR v-errmsg       AS CHAR NO-UNDO.
+DEFINE VAR v-textin       AS CHAR NO-UNDO.
+DEFINE VAR v-linecount    AS INTEGER NO-UNDO.
+DEFINE VAR v-fileopened   AS LOGICAL NO-UNDO.
+DEFINE VAR v-typemode     AS CHAR NO-UNDO.
+DEFINE VAR v-text         AS CHAR NO-UNDO.
+DEFINE VAR v-success      AS LOGICAL NO-UNDO.
+DEFINE VAR v-comment      AS CHAR NO-UNDO.
+
+DEFINE STREAM filestream.
+DEFINE TEMP-TABLE tt-include 
+ FIELD filename AS CHAR
+ FIELD parent AS CHAR
+ INDEX filename IS PRIMARY UNIQUE parent filename.
+ 
+/*If in PRODUCTION mode, then bail! */
+
+IF NOT devCheck() THEN DO:
+	logNote("Caution","{&file-name} was requested by " + remote_addr + " but could not be run with the agents in Production mode.").
+	ShowErrorScreen("Unable to run {&file-name}.  Request was logged and will be reviewed.").  
+	RETURN.
+END.
+
+ASSIGN
+ v-filename = GET-VALUE("filename")
+ v-directory = RIGHT-TRIM(GET-VALUE("directory"),"{&SLASH}") + "{&SLASH}"
+ v-typemode = "4gl"
+.
+
+ASSIGN FILE-INFO:FILE-NAME = v-directory + v-filename.
+IF FILE-INFO:FULL-PATHNAME = ? OR INDEX(FILE-INFO:FILE-TYPE,"d") > 0
+THEN DO:
+    ASSIGN v-errmsg = "File not found!".
+END. /*file didn't exist or was a directory*/
+ELSE DO:
+
+    /*first generate the x-ref */
+    ASSIGN v-success = DoXref(v-directory,v-filename,OUTPUT v-comment).
+    IF V-success THEN DO ON ERROR UNDO, LEAVE: /*file is a regular file*/
+        INPUT STREAM filestream FROM VALUE(v-directory + v-filename + ".x" ).
+        ASSIGN v-fileopened = TRUE.
+        REPEAT: 
+            IMPORT STREAM filestream UNFORMATTED v-textin.
+            ASSIGN v-linecount = v-linecount + 1.
+            IF NUM-ENTRIES(v-textin," ") > 1 AND NOT CAN-FIND(tt-include 
+                where tt-include.filename = entry(2,v-textin," ")
+                and tt-include.parent = entry(1,v-textin," ")
+                ) THEN DO:
+                CREATE tt-include.
+                ASSIGN
+                 tt-include.filename = entry(2,v-textin," ")
+                 tt-include.parent = entry(1,v-textin," ")
+                .            
+            END.
+        END.
+        INPUT STREAM filestream CLOSE.
+    END. /*DO BLOCK*/
+    IF ERROR-STATUS:ERROR OR v-fileopened = FALSE THEN ASSIGN v-errmsg = "Cannot open file.  " + ERROR-STATUS:GET-MESSAGE(1).
+    ELSE IF v-linecount = 0 THEN ASSIGN v-errmsg = "File was empty.".
+END. /*FILE WAS FOUND*/
+FUNCTION listChildren RETURNS LOGICAL(
+ INPUT myParent AS CHAR,
+ INPUT myLevel AS INTEGER
+):
+    DEFINE VAR mycount    AS INTEGER NO-UNDO.
+    DEFINE VAR v-reccount AS INTEGER NO-UNDO.
+    FOR EACH tt-include
+     WHERE tt-include.parent = myparent
+     AND tt-include.filename NE myparent:
+        ASSIGN mycount = mycount + 1.
+        {&OUT} 
+         '<nobr><img src="' ffimages 'cleardot.gif " width="' 28 * mylevel '" height="1">'
+         '<img src="' ffimages 'underarrow.gif " width="28" height="22" align="middle">&nbsp~;'
+         '<a href="freeview.html?from=freedep&filename=' tt-include.filename '">' tt-include.filename '</a>'
+          "</nobr><br>". 
+        listChildren(tt-include.filename, mylevel + 1).
+    END. 
+    RETURN TRUE.
+END FUNCTION.
+</script>
+<html>
+<head>
+	<title>FreeFramework Dependency Viewer</title>
+	<link rel="STYLESHEET" type="TEXT/CSS" href="`ffstyles`freestyle.css">
+</head>
+
+<body background="`ffimages`lyellow.gif">
+<table border="0" width="100%" cellspacing="0">
+<tr>
+	<td align="LEFT">
+		<span class="sectionname">FreeFrameWork Dependency Viewer</span>
+	</td>
+	<td align= "RIGHT">
+	<a href="freefiletools.html?directory=`v-directory`" onClick="history.back(); return false;">[Back to File Tools]</a>
+    </td>
+</tr>
+</table>
+<% if v-errmsg ne "" then do: %>
+<span class="error">`v-errmsg`</span></br>
+<% end. %>
+<span class="sectionname">`v-directory + v-filename` - Included Files:</span><br>
+<% listChildren(v-directory + replace(v-filename,".html",".w"),1). %>
+</body>
+</html>
+
+

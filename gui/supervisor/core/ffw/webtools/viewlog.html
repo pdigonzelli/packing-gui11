@@ -1,0 +1,149 @@
+<script language="SpeedScript">
+/*-----------------------------------------------------------------------*
+  File........: viewlog.html
+  Version.....: 1.04 - 12/21/2000
+  Description : Tool for viewing a "tail -f" of an error log.
+  Input Param : <none>
+  Output Param: <none>
+  Author......: Mario Paranhos - BravePoint/ USI (770) 449-9696
+  Copyright...: FreeFramework 2000  - http://www.freeframework.org
+  Created.....: 6/20/2000
+  Notes.......:
+ *-----------------------------------------------------------------------*/
+{ ffw/lib/ffw_global.i }                    /*PATH SETTINGS AND OTHER GENERAL THINGS*/
+{ ffw/lib/ffpplib.i }
+
+def var vLogFile as char no-undo.
+def var vLineNum as int init 0 no-undo.
+def var vRefresh as int init 60 no-undo.
+def var tChar as char no-undo.
+def var vNumLines as int init 20 no-undo.
+def var vDispOptions as char init "yes" no-undo. 
+def var vColorNew as char init "yes" no-undo. 
+def var vLastLine as int no-undo.
+
+define temp-table ttlog
+  field linenum as int
+  field linetext as char
+  field tdoptions as char
+  index main is primary unique
+  linenum descending.
+
+FUNCTION GetOption RETURN CHARACTER (INPUT pOption AS CHARACTER,
+                                     INPUT pCurValue AS CHARACTER):
+  DEF VAR tChar AS CHAR NO-UNDO.
+  
+  ASSIGN tChar = get-value(pOption) NO-ERROR.
+  
+  IF tChar > "" THEN
+    RETURN tChar.
+  ELSE
+    RETURN pCurValue.	 
+  
+END FUNCTION.
+
+if vlogfile = "" then
+&IF "{&WEB_CONTEXT_EXCLUDE}" = "YES" &THEN
+  ASSIGN vLogFile = GetAGentSetting("srvrLogFile").
+&ELSE
+  ASSIGN vlogfile = IF PROVERSION BEGINS "2" THEN WEB-CONTEXT:get-config-value("ErrorLogFile") ELSE WEB-CONTEXT:get-config-value("srvrLogFile").
+&ENDIF
+
+
+ASSIGN vLogFile     = GetOption("logfile",vLogFile)
+       vLogFile     = SEARCH(vLogFile)
+       vRefresh     = INT(GetOption("refresh",string(vRefresh)))
+       vNumLines    = INT(GetOption("numlines",string(vNumLines)))
+       vDispOptions = GetOption("options",vDispOptions)
+       vColorNew    = GetOption("colornew",vColorNew)
+       vLastLine    = INT(GetOption("lastline",string(vLastLine))).  
+       
+IF vLogFile <> ? AND 
+   vLogFile <> "" THEN DO:
+  
+  input from value(vLogFile).
+
+  repeat:
+    assign vlinenum = vlinenum + 1.
+    import unformatted tchar.
+    create ttlog.
+    assign ttlog.linenum = vLineNum.
+    assign ttlog.linetext = HTML-encode(tchar).
+  
+    if vColorNew = "yes" and vLineNum >= vLastLine then
+    assign ttlog.tdoptions = 'bgcolor="Yellow"'.
+  
+  end.
+
+  assign vLastLine = vLineNum
+         vLineNum = 0.
+  
+  input close.
+END.
+
+</script>
+<html>
+<head>
+  <!--WSS if vRefresh > 0 THEN -->
+  <META HTTP-EQUIV="REFRESH" CONTENT="`vRefresh`; URL=viewlog.html?options=`vDispOptions`&logfile=`vLogFile`&refresh=`vRefresh`&numlines=`vNumLines`&colornew=`vColorNew`&lastline=`vLastLine`">           
+  <title>FreeFrameWork Server Log Viewer</title>
+  <link rel="STYLESHEET" type="TEXT/CSS" href="`ffstyles`freestyle.css">
+</head>
+
+<body background="`ffimages`lyellow.gif">
+<span class="sectionname">FreeFrameWork Server Log Viewer</span>
+  <!--WSS IF vDispOptions = "yes" THEN DO: -->
+    <form action="viewlog.html" name="options" target="_self">
+	  <input type="hidden" name="lastline" value="`vLastLine`">
+	  <table>
+	    <tr>
+		  <td align="right" class="rowheader">Log File:</td>
+		  <td align="right"><input type="text" name="logfile" value="`vLogFile`" size="30" maxlength="40"></td>
+                  <TD><input type="submit" value="Update Options"></td>
+		</tr>
+	    <tr>
+		  <td align="right" class="rowheader">Refresh:</td>
+		  <td align="right"><input type="text" name="refresh" value="`vRefresh`" size="30" maxlength="40"></td>
+		</tr>
+	    <tr>
+		  <td align="right" class="rowheader">Lines:</td>
+		  <td align="right"><input type="text" name="numlines" value="`vNumLines`" size="30" maxlength="40"></td>
+		</tr>
+	    <tr>
+		  <td align="right" class="rowheader">Color New Lines:</td>
+		  <td align="right"><input type="text" name="colornew" value="`vColorNew`" size="30" maxlength="40"></td>
+		</tr>
+	    <tr>
+		  <td align="right" class="rowheader">Show Options:</td>
+		  <td align="right"><input type="text" name="options" value="`vDispOptions`" size="30" maxlength="40"></td>
+		</tr>
+      </table>
+	</form>
+  <!--WSS END. ELSE DO: -->
+    <form action="viewlog.html" name="getnew" target="_self">
+	<input type="hidden" name="lastline" value="`vLastLine`">
+	<input type="hidden" name="logfile" value="`vLogFile`">
+	<input type="hidden" name="refresh" value="`vRefresh`">
+	<input type="hidden" name="numlines" value="`vNumLines`">
+	<input type="hidden" name="colornew" value="`vColorNew`">
+	<input type="hidden" name="options" value="`vDispOptions`">
+	<input type="submit" value="Get New Lines">
+    </form>
+
+  <!--WSS END. -->
+
+<br><b>Displaying `vLogFile` - Last Updated `STRING(time,"HH:MM:SS")`</b><br><br
+>
+<table cellspacing="0" cellpadding="0">
+<!--WSS for each ttlog no-lock: -->
+<TR>
+  <!-- <TD>`ttlog.linenum`</TD> -->
+  <TD nowrap `ttlog.tdoptions`><small>`ttlog.linetext`</small></td>
+</TR>
+<!--WSS if vNumLines <> 0 AND vLineNum = vNumLines THEN LEAVE. -->
+<!--WSS vLineNum = vLineNum + 1. -->
+<!--WSS end. -->
+</TABLE>
+
+</body>
+</html> 

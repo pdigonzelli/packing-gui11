@@ -1,0 +1,126 @@
+<SCRIPT LANGUAGE="SPEEDSCRIPT">
+/*-----------------------------------------------------------------------*
+  File........: freeindex.html
+  Version.....: 1.04 - 5/16/01
+  Description : Left-hand navigational area of FreeFrameWork WS Workshop extensions
+  Input Param : <none>
+  Output Param: <none>
+  Author......: S.E. Southwell - BravePoint, Inc. (214) 488-2239
+  Copyright...: FreeFramework 2000,2001  - http://www.freeframework.org
+  Created.....: 5/10/2000
+  Notes.......: 07/06/2001 SWL get version from ini file
+ *-----------------------------------------------------------------------*/
+{ ffw/lib/ffw_global.i }                    /*PATH SETTINGS AND OTHER GENERAL THINGS*/
+{ ffw/lib/ffpplib.i }
+{ ffw/lib/lognote.i }
+
+define var i as integer no-undo.
+DEFINE VAR v-devuser AS CHAR NO-UNDO.
+
+&IF "{&MULTI_DEV_PROPATHS}" = "YES" &THEN
+PROCEDURE OUTPUT-HEADERS:
+    ASSIGN v-devuser = GET-VALUE("devuser").
+    IF GET-FIELD("devuser") ne "" THEN DO:
+        set-cookie ("devuser":U, v-devuser, today + 365, ?, ?, ?, ?).
+    END.
+END PROCEDURE.
+&ENDIF
+
+/*If in PRODUCTION mode, then bail! */
+IF NOT DevCheck() THEN DO:
+	logNote("Caution","{&file-name} was requested by " + remote_addr + " but could not be run with the agents in Production mode.").
+	ShowErrorScreen("Unable to run showcfg.  Request was logged and will be reviewed.").  
+	RETURN.
+END.
+
+</script>
+<html>
+<head>
+	<title>Index of Webtools</title>
+	<link rel="STYLESHEET" type="TEXT/CSS" href="`ffstyles`freestyle.css">
+	<style type="text/css">
+	body {font-family: arial; font-size: 9pt; background-color: #cccccc;}
+	a:link {font-family: arial; font-size: 9pt;}
+	a:visited {font-family: arial; font-size: 9pt;}
+	a:active {font-family: arial; font-size: 9pt;}
+	a:hover {font-weight: bold; color: #000066;}
+	.sectionhdr {font-family: arial; font-size: 10pt; color: #990000; font-weight: 900;}
+	.itmlist {padding: 1px 3px 1px 5px;}
+	.smallnote {font-size: 7pt; font-family: arial; color: #660000;}
+	.small {font-size: 8pt; background-color: #cccccc;}
+	</style>
+</head>
+
+<BODY CLASS="leftnav">
+<% &IF "{&MULTI_DEV_PROPATHS}" = "YES" &THEN %>
+<form name="webForm" action="freeindex.html">
+<span class="sectionhdr">User: </span>
+<br><input type="text" name="devuser" value="`v-devuser`" class="datafield" size="10">
+</form>
+<% &ENDIF %>
+<span class="sectionhdr">Development Tools:</span><br>
+<div class="itmlist">
+	<A HREF="freefiletools.html?directory=." class="lnavlink" TARGET="WS_main">FFW File&nbsp;Tools</A><br> 
+	<A HREF="editor.w" class="lnavlink" TARGET="WS_main">Editor</A><br> 
+	<A HREF="edtscrpt.w" class="lnavlink" TARGET="WS_main">Scripting&nbsp;Lab</A><br> 
+	<A HREF="oscommnd.w" class="lnavlink" TARGET="WS_main">OS&nbsp;Command</A> 
+</div> 
+<br>
+<span class="sectionhdr">Databases:</span>
+<FORM METHOD="POST" NAME="schemaform" ACTION="schemalist.html" style="padding: 0; margin: 0; background-color: #cccccc;" class="itmlist" TARGET="WS_main">
+	<!--WSS IF NUM-DBS eq 0 THEN DO: -->
+	<span class="smallnote">(None Connected)</span>  
+  	<!--wss end. ELSE DO: -->
+	<SELECT NAME="dbName" STYLE="font-size: 8pt;">     
+  		<!--wss DO i = 1 TO NUM-DBS: -->      
+    	<OPTION>`LDBNAME(i)`</OPTION>        
+    	<!--wss END.  -->  
+	</SELECT>
+	<INPUT TYPE="IMAGE" VALUE="GO" SRC="`ffimages`go.gif" BORDER="0">
+  	<!--wss END. -->
+	</FORM>
+<br>
+<span class="sectionhdr">Troubleshooting:</span>
+<div class="itmlist">
+	<A HREF="session.w" class="lnavlink" TARGET="WS_main">Agent&nbsp;Variables</A><br>
+	<A HREF="showcfg.html" class="lnavlink" TARGET="WS_main">Agent&nbsp;Init.&nbsp;Values</A><br>
+	<A HREF="viewlog.html" class="lnavlink" TARGET="WS_main">Error&nbsp;Log</A><br>
+	<A HREF="pplist.w" class="lnavlink" TARGET="WS_main">Object&nbsp;State</A><br> 
+	<A HREF="propath.w" class="lnavlink" TARGET="WS_main">ProPath</A><br> 
+	<A HREF="vstinfo.w" class="lnavlink" TARGET="WS_main">Virtual&nbsp;System&nbsp;Tables</A>&nbsp;<br> 
+	<A HREF="promsgs.w" class="lnavlink" TARGET="WS_main">Messages</A><br>
+</div>
+<br>
+<span class="sectionhdr">PlusPack:</span>
+<div class="itmlist">
+	<A HREF="../plus/am.p" class="lnavlink" TARGET="WS_main">App Manager</A><br>
+	<A HREF="../plus/db.p" class="lnavlink" TARGET="WS_main">Data Browser</A><br>
+</div>
+<br>
+<span class="sectionhdr">Resources:</span><br>
+<div class="itmlist">
+	<A HREF="dirlist.w?directory=." class="lnavlink" TARGET="WS_main">Classic File&nbsp;Tools</A><br> 
+	<A HREF="http://www.webspeed.com" TARGET="libraryWindow" class="lnavlink">WebSpeed&nbsp;Home</A><br>
+	<A HREF="http://www.whosplayin.com/ws/wsfaq.html" TARGET="libraryWindow" class="lnavlink">WebSpeed&nbsp;FAQ</A><br>
+	<A HREF="http://www.zdnet.com/devhead/resources/tag_library/" TARGET="libraryWindow"  class="lnavlink"
+		onClick="window.open('','libraryWindow','width=630,height=400,menubar=1,toolbar=1,location=1,scrollbars=1,resizable=1,status=1');">
+		HTML&nbsp;Tag&nbsp;Library</A><br>
+	<A HREF="mailto:ffw@peg.com?subject=Feedback+On+FreeFramework" class="lnavlink">Feedback</a><br>
+	<A HREF="http://www.freeframework.org/legal.shtml" class="lnavlink" TARGET="WS_main">Copyrights&copy;</A>
+</div>
+<p align="center">
+<a href="http://www.freeframework.org" TARGET="new"><img src="`ffimages`enhancedwithffw.gif" width="90" height="30" border="0" alt="Enhanced With FreeFrameWork"></a>
+<br>Version `ffversion`
+</p>
+<SCRIPT LANGUAGE="JavaScript">
+  <!-- 
+  if (parent.WS_main == null) {
+      for (var lc = 0; lc < document.links.length; lc++) {
+        if (document.links[lc].target == "WS_main") document.links[lc].target = "_self";
+      }
+  }
+  //-->
+</script>
+</BODY>
+</HTML>
+
